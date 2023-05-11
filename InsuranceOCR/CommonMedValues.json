@@ -1,0 +1,307 @@
+[
+  {
+    "Id": 1,
+    "TestName": "Haemoglobin",
+    "HighestRangeFrom": 10,
+    "HighestRangeTill": 19,
+    "Alternatives": "HEMOGLOBIN|HAEMOGLOBIN|HBA1C"
+  },
+  {
+    "Id": 2,
+    "TestName": "Total WBC Count",
+    "HighestRangeFrom": 4000,
+    "HighestRangeTill": 11000,
+    "Alternatives": "White|(WBC)|WBC|W.B.C|W.B.C.|(TLC)|TLC|Leucocytes"
+  },
+  {
+    "Id": 3,
+    "TestName": "MCV",
+    "HighestRangeFrom": 75,
+    "HighestRangeTill": 96,
+    "Alternatives": "(MCV)|MCV|M C V|M.C.V.|Mean Corpuscular Volume|Corpuscular|Corp|Volume"
+  },
+  {
+    "Id": 4,
+    "TestName": "MCH",
+    "HighestRangeFrom": 27,
+    "HighestRangeTill": 32,
+    "Alternatives": "(MCH)|MCH|M C H|M.C.H.|Mean Cell Haemoglobin|Mean Corpuscular Haemoglobin"
+  },
+  {
+    "Id": 5,
+    "TestName": "MCHC",
+    "HighestRangeFrom": 30,
+    "HighestRangeTill": 36,
+    "Alternatives": "(MCHC)|MCHC|M C H C|M.C.H.C.|Mean Cell Haemoglobin CON|Mean Corpuscular Haemoglobin Conc"
+  },
+  {
+    "Id": 6,
+    "TestName": "Platelet Count",
+    "HighestRangeFrom": 150000,
+    "HighestRangeTill": 400000,
+    "Alternatives": "Platelet count|Platelets|PLATELET|PLATELETS"
+  },
+  {
+    "Id": 7,
+    "TestName": "ESR",
+    "HighestRangeFrom": 0,
+    "HighestRangeTill": 20,
+    "Alternatives": "E.S.R.|Erythrocyte"
+  },
+  {
+    "Id": 8,
+    "TestName": "RBC Count",
+    "HighestRangeFrom": 4.5,
+    "HighestRangeTill": 6.5,
+    "Alternatives": "R.B.C.|Erythrocyte|RBCs|R B C|Red Blood Cells"
+  },
+  {
+    "Id": 9,
+    "TestName": "S. Creatinine",
+    "HighestRangeFrom": 0.2,
+    "HighestRangeTill": 1.2,
+    "Alternatives": "SERUM|CREATININE|S. Creatinine|SERUM CREATININE"
+  },
+  {
+    "Id": 10,
+    "TestName": "Trigiycerides",
+    "HighestRangeFrom": 65,
+    "HighestRangeTill": 165,
+    "Alternatives": "Triglyceride|Trigiycerides|TRIGLYCERIDE|S. Trigiycerides|Serum Trigiycerides|TRIGLYCERIDES|T.G"
+  },
+  {
+    "Id": 11,
+    "TestName": "HDL",
+    "HighestRangeFrom": 35,
+    "HighestRangeTill": 55,
+    "Alternatives": "HDL|Cholesterol-HDL Direct|CHOLESTEROL|H D L CHOLESTEROL DIRECT|HDL Cholesterol|H D L CHOLESTEROL|CHOLESTEROL HDL|HDL CHOLESTEROL"
+  },
+  {
+    "Id": 12,
+    "TestName": "Blood Urea",
+    "HighestRangeFrom": 5,
+    "HighestRangeTill": 20,
+    "Alternatives": "UREA|Blood Urea|BLOOD UREA|Urea"
+  },
+  {
+    "Id": 13,
+    "TestName": "Albumin",
+    "HighestRangeFrom": 3.5,
+    "HighestRangeTill": 5.5,
+    "Alternatives": "Albumin|ALBUMIN|S. Albumin|Serum Albumin|Albumin - G"
+  },
+  {
+    "Id": 14,
+    "TestName": "Globulin",
+    "HighestRangeFrom": 2.3,
+    "HighestRangeTill": 3.5,
+    "Alternatives": "Globulin|GLOBULIN|Serum Globulin|S. Globulin"
+  },
+  {
+    "Id": 15,
+    "TestName": "HIV",
+    "HighestRangeFrom": 3,
+    "HighestRangeTill": 7,
+    "Alternatives": "HIV",
+    "StringResult": "NEGATIVE|POSITIVE"
+  },
+  {
+    "Id": 16,
+    "TestName": "Total Bilirubin",
+    "HighestRangeFrom": 0.2,
+    "HighestRangeTill": 1.2,
+    "Alternatives": "Bilirubin|BILIRUBIN|S. Bilirubin|Serum Bilirubin"
+  },
+  {
+    "Id": 17,
+    "TestName": "HbsAg",
+    "HighestRangeFrom": 0,
+    "HighestRangeTill": 0,
+    "Alternatives": "HBSAG|HBsAg|HBsAG|HbsAg|HBsAG|HbsAg|HbsAg|Hbs Ag(Rapid)|HbsAg|HBsAG|HBsAG|HBs Ag",
+    "StringResult": "NEGATIVE|POSITIVE"
+  },
+  {
+    "Id": 18,
+    "TestName": "Nicotine Urine",
+    "HighestRangeFrom": 0,
+    "HighestRangeTill": 200,
+    "Alternatives": "Cotinine|Nicotinine|COTININE|NICOTININE|Urine|URINE",
+    "StringResult": "NEGATIVE|POSITIVE"
+  },
+  {
+    "Id": 19,
+    "TestName": "S.Proteins",
+    "HighestRangeFrom": 6.2,
+    "HighestRangeTill": 8,
+    "Alternatives": "Protein|Proteins|PROTEIN|PROTEINS|Serum Proteins|SERUM PROTEINS"
+  },
+  {
+    "Id": 20,
+    "TestName": "SGOT",
+    "HighestRangeFrom": 0,
+    "HighestRangeTill": 40,
+    "Alternatives": "SGOT|S.G.O.T.|S.G.O.T / AST|SGOT / AST|Serum SGOT|SGOT (AST)|S.G.O.T. (AST)|AST/SGOT"
+  },
+  {
+    "Id": 21,
+    "TestName": "SGPT",
+    "HighestRangeFrom": 0,
+    "HighestRangeTill": 35,
+    "Alternatives": "SGPT|S.G.P.T. (ALT)|SGPT (ALT)|S.G.P.T.|SGPT|S.G.P.T / ALT|SGPT / ALT|Serum SGPT|ALT/SGPT"
+  },
+  {
+    "Id": 22,
+    "TestName": "GGTP",
+    "HighestRangeFrom": 5,
+    "HighestRangeTill": 50,
+    "Alternatives": "GAMMA|GAMMAGT|GAMMA GT|GGTP (GGT)|Serum GGT|GGT|Glutamyl|GAMMA - GTP|GLUTAMYL|TRANSFERASE|GGTP"
+  },
+  {
+    "Id": 23,
+    "TestName": "Alkaline Phosphatase",
+    "HighestRangeFrom": 80,
+    "HighestRangeTill": 306,
+    "Alternatives": "PHOSPHATASE|Phosphatase|ALPI|Alkaline|ALKALINE"
+  },
+  {
+    "Id": 24,
+    "TestName": "BUN",
+    "HighestRangeFrom": 4,
+    "HighestRangeTill": 25,
+    "Alternatives": "UREA|NITROGEN|Urea|Nitrogen"
+  },
+  {
+    "Id": 25,
+    "TestName": "Quantity",
+    "HighestRangeFrom": 4,
+    "HighestRangeTill": 25,
+    "Alternatives": "QUANTITY",
+    "HasSubMenu": true
+  },
+
+  {
+    "Id": 26,
+    "TestName": "Colour",
+    "HighestRangeFrom": 4,
+    "HighestRangeTill": 25,
+    "Alternatives": "COLOUR",
+    "StringResult": "PALE YELLOW|YELLOW|STRAW YELLOW",
+    "HasSubMenu": true
+  },
+
+  {
+    "Id": 27,
+    "TestName": "Appearance",
+    "HighestRangeFrom": 4,
+    "HighestRangeTill": 25,
+    "Alternatives": "APPEARANCE",
+    "StringResult": "CLEAR",
+    "HasSubMenu": true
+  },
+
+  {
+    "Id": 28,
+    "TestName": "Deposits",
+    "HighestRangeFrom": 4,
+    "HighestRangeTill": 25,
+    "Alternatives": "DEPOSITS",
+    "HasSubMenu": true
+  },
+  {
+    "Id": 29,
+    "TestName": "Reaction",
+    "HighestRangeFrom": 4,
+    "HighestRangeTill": 25,
+    "Alternatives": "REACTION",
+    "HasSubMenu": true
+  },
+  {
+    "Id": 30,
+    "TestName": "Gravity",
+    "HighestRangeFrom": 4,
+    "HighestRangeTill": 25,
+    "Alternatives": "GRAVITY",
+    "HasSubMenu": true
+  },
+  {
+    "Id": 31,
+    "TestName": "Sugar",
+    "HighestRangeFrom": 4,
+    "HighestRangeTill": 25,
+    "StringResult": "ABSENT|PRESENT",
+    "Alternatives": "Sugar|Glucose",
+    "HasSubMenu": true
+  },
+  {
+    "Id": 32,
+    "TestName": "Ketones",
+    "HighestRangeFrom": 4,
+    "HighestRangeTill": 25,
+    "StringResult": "ABSENT|PRESENT",
+    "Alternatives": "KETONES|KETON",
+    "HasSubMenu": true
+  },
+  {
+    "Id": 33,
+    "TestName": "Pus Cells",
+    "HighestRangeFrom": 4,
+    "HighestRangeTill": 25,
+    "StringResult": "ABSENT|PRESENT|OCCASIONAL",
+    "Alternatives": "PUS",
+    "HasSubMenu": true
+  },
+  {
+    "Id": 34,
+    "TestName": "Epithelial Cells",
+    "HighestRangeFrom": 4,
+    "HighestRangeTill": 25,
+    "StringResult": "ABSENT|PRESENT|OCCASIONAL",
+    "Alternatives": "EPITHELIAL",
+    "HasSubMenu": true
+  },
+  {
+    "Id": 35,
+    "TestName": "Casts",
+    "HighestRangeFrom": 4,
+    "HighestRangeTill": 25,
+    "StringResult": "ABSENT|PRESENT",
+    "Alternatives": "CASTS",
+    "HasSubMenu": true
+  },
+  {
+    "Id": 36,
+    "TestName": "Bacteria",
+    "HighestRangeFrom": 4,
+    "HighestRangeTill": 25,
+    "StringResult": "ABSENT|PRESENT",
+    "Alternatives": "BACTERIA",
+    "HasSubMenu": true
+  },
+  {
+    "Id": 37,
+    "TestName": "Crystals",
+    "HighestRangeFrom": 4,
+    "HighestRangeTill": 25,
+    "StringResult": "ABSENT|PRESENT",
+    "Alternatives": "CRYSTALS",
+    "HasSubMenu": true
+  },
+  {
+    "Id": 38,
+    "TestName": "Amorphous Material",
+    "HighestRangeFrom": 4,
+    "HighestRangeTill": 25,
+    "StringResult": "ABSENT|PRESENT",
+    "Alternatives": "AMORPHOUS",
+    "HasSubMenu": true
+  },
+  {
+    "Id": 39,
+    "TestName": "Mucous Threads",
+    "HighestRangeFrom": 4,
+    "HighestRangeTill": 25,
+    "StringResult": "ABSENT|PRESENT",
+    "Alternatives": "MUCUS",
+    "HasSubMenu": true
+  }
+]
