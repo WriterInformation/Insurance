@@ -1,0 +1,175 @@
+﻿@model List<BPaasInsurance.Policy_Master>
+
+@*@{
+    Layout = null;
+}*@
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" rel="stylesheet" />
+
+    <script>
+        $(document).ready(function () {
+            $('#example').DataTable({
+                paging: true,
+                ordering: true,
+                info: true,
+                //scrollY: '200px',     //For Scrolling
+                //scrollCollapse: true,   //For Scrolling
+            });
+        });
+  
+        $(function () {
+            try {
+                var dir = $('#dir').val();
+                var col = $('#col').val();
+                var header = $("th a[href*=" + col + "]");
+                if (dir == "Ascending") {
+                    header.text(header.text() + "  ▲")
+                }
+                if (dir == "Descending") {
+                    header.text(header.text() + "  ▼");
+                }
+
+            } catch (e) {
+
+            }
+        })
+
+        $('.filter-checkbox').on('change', function (e) {
+            var searchTerms = []
+            $.each($('.filter-checkbox'), function (i, elem) {
+                if ($(elem).prop('checked')) {
+                    searchTerms.push("^" + $(this).val() + "$")
+                }
+            })
+            dataTable.column(1).search(searchTerms.join('|'), true, false, true).draw();
+        });
+    </script>
+
+</head>
+<body>
+
+    <br />
+
+    <div class="container-fluid">
+
+        @*<div class="content">
+                <div class="row">
+
+                    <div class="pull-left" style="width:30%">
+
+                        <h5>
+                            <label style="padding-top:6px;padding-left:190px">
+                                Proposal No :
+                            </label>
+                        </h5>
+
+
+
+                    </div>
+                    <div class="pull-right" style="width:70%">
+                        <div class="input-group" style="width:50%">
+                            <input type="search" class="form-control" placeholder="Enter Proposal No." size="50">
+                            &nbsp;
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button">Search</button>
+                                <button class="btn btn-primary" type="button">Button</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                </div>
+                <div class="row">
+                    <div class="col-8">
+                        <div class="filter-wrapper">
+                            <input type="checkbox" class="filter-checkbox" value="0" /> Pending
+                            <input type="checkbox" class="filter-checkbox" value="1" />  Processed
+                            <input type="checkbox" class="filter-checkbox" value="2" />  Failed
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="btn-group submitter-group float-right">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">Status</div>
+                            </div>
+                            <select class="form-control status-dropdown">
+                                <option value="">All</option>
+                                <option value="DRF">Draft</option>
+                                <option value="PCH">Pending Review</option>
+                                <option value="PAU">Pending Authorisation</option>
+                                <option value="Received">Received</option>
+                                <option value="Processing">Processing</option>
+                                <option value="Query">Query</option>
+                                <option value="Approved">Approved</option>
+                                <option value="Rejected">Rejected</option>
+                                <option value="Amended">Amended</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>*@
+
+        <table id="example" class="display cell-border" style="width:100%">
+            <thead>
+                <tr style="background-color: #ffcc51 ">
+
+                    <th>Policy No</th>
+                    <th>Created Date</th>
+                    <th>Policy Status Code</th>
+                    <th>View Policy Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    @Html.HiddenFor(model => item.PolicyNo)
+                    <tr>
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.PolicyNo)
+                        </td>
+                        <td>
+                            @item.CreatedDate.Value.ToString("dddd, dd MMMM yyyy")
+                        </td>
+                        <td>
+                            @((item.PolicyStatusCode == 1) ? "Active" : "Inactive")
+                        </td>
+                        <td style="text-align:center">
+                            @Html.ActionLink("View", "ViewPolicyDetails", new { PolicyNo = item.PolicyNo })
+                        </td>
+                    </tr>
+
+
+
+                }
+            </tbody>
+
+        </table>
+
+    </div>
+    <a href="@ViewBag.Doc">View Document</a>
+
+    
+
+
+
+</body>
+</html>
+
+
+
+
+
+

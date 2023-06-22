@@ -1,0 +1,1206 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12 table-bordered blockStyle">
+                <div class="row mainBlock">
+                    <div class="col-md-12">
+                        <div class="panel with-nav-tabs panel-info">
+                            <div class="panel-heading">
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a href="#tab1info" data-toggle="tab">Medical Values</a></li>
+                                    <li><a href="#tab2info" data-toggle="tab">Financial Info</a></li>
+                                    <li><a href="#tab3info" data-toggle="tab">Case Summary</a></li>
+                                </ul>
+                            </div>
+                            <div class="panel-body">
+                                <div class="tab-content heightStyle">
+                                    <div class="tab-pane fade in active" id="tab1info">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <asp:GridView ID="gvMedicalData" runat="server" AutoGenerateColumns="false" CellSpacing="10"
+                                                              GridLines="Horizontal" CellPadding="10" EmptyDataText="No Medical Data Available" OnRowDataBound="gvMedicalData_RowDataBound"
+                                                              ShowHeaderWhenEmpty="true">
+                                                    <Columns>
+                                                        <asp:TemplateField HeaderText="Medical Points" HeaderStyle-CssClass="HeadersInfo" ItemStyle-CssClass="itemsClass" ItemStyle-HorizontalAlign="Left" ItemStyle-BorderStyle="None" HeaderStyle-Font-Bold="true" HeaderStyle-Width="30%" ItemStyle-Width="30%">
+                                                            <ItemTemplate>
+                                                                <asp:Label ID="lblMedPoint" runat="server" Text='<%# Bind("MedPoint") %>'></asp:Label>
+                                                            </ItemTemplate>
+                                                        </asp:TemplateField>
+
+                                                        <asp:TemplateField HeaderText="Values" HeaderStyle-CssClass="HeadersInfo" ItemStyle-HorizontalAlign="Left" ItemStyle-BorderStyle="None" HeaderStyle-Font-Bold="true" HeaderStyle-Width="25%" ItemStyle-CssClass="itemStyle" ItemStyle-Width="25%">
+                                                            <ItemTemplate>
+                                                                <asp:TextBox ID="txtMedPointValues" runat="server" Text='<%#Bind("Result") %>' CssClass="form-control textstyle" Font-Size="Small"></asp:TextBox>
+
+                                                            </ItemTemplate>
+                                                        </asp:TemplateField>
+
+                                                        <asp:TemplateField HeaderText="Ranges" HeaderStyle-CssClass="HeadersInfo" ItemStyle-HorizontalAlign="Left" ItemStyle-BorderStyle="None" HeaderStyle-Font-Bold="true" HeaderStyle-Width="45%" ItemStyle-Width="45%" ItemStyle-CssClass="ItemPadd">
+                                                            <ItemTemplate>
+                                                                <asp:Label ID="lblRangeTitle" runat="server" Text="Range : " Font-Size="Smaller"></asp:Label>
+                                                                <asp:Label ID="lblMedPointRange" runat="server" Text='<%# Bind("Ref_Range") %>' Font-Size="Smaller"></asp:Label>
+                                                                <br />
+
+                                                                <%--<hr id="hrRange" runat="server" />--%>
+                                                                <%--<input type="range" name="PlateletCount" id="range_PlateletCount" value="<% =Eval(" Result") %>" oninput="range_PlateletCount_disp.value = range_PlateletCount.value" />
+                                                                <output id="range_PlateletCount_disp" aria-disabled="true"></output>--%>
+
+                                                                <%--<div class="chrome">
+                                                                    <table width="100%" style="border:none;">
+                                                                        <tr>
+                                                                            <td>
+                                                                                <asp:Label ID="lblMinVal" runat="server" Font-Size="XX-Small" Text='<%# Bind("MinVal") %>'></asp:Label>
+                                                                            </td>
+                                                                            <td id="tdValue" runat="server" style="padding-left:10px;padding-right:10px;">
+                                                                                <input id="myinput" runat="server" min='<%# Eval("MinVal") %>' max='<%# Eval("MaxVal") %>' type="range" value='<%# Eval("Result") %>' />
+                                                                            </td>
+                                                                            <td>
+                                                                                <asp:Label ID="lblMaxVal" runat="server" Font-Size="XX-Small" Text='<%# Bind("MaxVal") %>'></asp:Label>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </div>--%>
+                                                            </ItemTemplate>
+                                                        </asp:TemplateField>
+                                                    </Columns>
+                                                </asp:GridView>
+
+                                                <table style="width: 100%; text-align: center;">
+                                                    <tr>
+                                                        <td align="center">
+                                                            <asp:PlaceHolder ID="DBDataPlaceHolder" runat="server"></asp:PlaceHolder>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="tab-pane fade" id="tab2info">
+                                        <asp:UpdatePanel ID="updPnl" runat="server">
+                                            <ContentTemplate>
+                                                <table width="100%">
+                                                    <tr>
+                                                        <td width="70%" class="EntryFormRowField" style="border:none;">
+                                                            Financial Document<span class="Star">*</span><br />
+
+                                                            <asp:DropDownList ID="DrpRadSalSlipFinDoc1" runat="server" Width="100%" CssClass="form-control" AutoPostBack="true" OnSelectedIndexChanged="DrpRadSalSlipFinDoc1_SelectedIndexChanged">
+                                                                <asp:ListItem Text="Salary Slip" Value="Salary Slip"></asp:ListItem>
+                                                                <asp:ListItem Text="ITR" Value="ITR"></asp:ListItem>
+                                                                <asp:ListItem Text="Bank statement" Value="Bank statement"></asp:ListItem>
+                                                                <asp:ListItem Text="Form 16" Value="Form 16"></asp:ListItem>
+                                                                <asp:ListItem Text="As Per CIBIL" Value="APC"></asp:ListItem>
+                                                                <asp:ListItem Text="CTC Letter" Value="CTC"></asp:ListItem>
+                                                            </asp:DropDownList>
+                                                            <asp:RequiredFieldValidator ID="reqFinDocs" runat="server" ControlToValidate="DrpRadSalSlipFinDoc1" ErrorMessage="Select Financial Document First." ValidationGroup="FinGroup"></asp:RequiredFieldValidator>
+
+                                                            <%--<telerik:RadComboBox RenderMode="Lightweight" ID="DrpRadSalSlipFinDoc" runat="server"
+                                                                                     EmptyMessage="Select Financial Document" Width="100%" AutoPostBack="true" OnSelectedIndexChanged="DrpRadSalSlipFinDoc_SelectedIndexChanged">
+                                                                <Items>
+
+                                                                    <telerik:RadComboBoxItem Text="Salary Slip" Value="Salary Slip" />
+                                                                    <telerik:RadComboBoxItem Text="ITR" Value="ITR" />
+                                                                    <telerik:RadComboBoxItem Text="Bank statement" Value="Bank statement" />
+                                                                    <telerik:RadComboBoxItem Text="Form 16" Value="Form 16" />
+                                                                    <telerik:RadComboBoxItem Text="Cibil" Value="Cibil" />
+
+                                                                </Items>
+
+                                                            </telerik:RadComboBox>--%>
+                                                            <asp:RequiredFieldValidator ID="RequiredFieldValidator37" ControlToValidate="DrpRadSalSlipFinDoc1" ErrorMessage="FinancialDocument is required" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                        </td>
+                                                        <td width="10%" style="border:none;"></td>
+                                                        <td width="20%" style="border:none;text-align:right;">
+                                                            <asp:Button ID="btnSaveItem" runat="server" CssClass="btn btn-block btn-success" Text="ADD / Update" OnClick="btnSaveItem_Click" />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="3" height="15px" style="border:none;">
+                                                            <hr />
+                                                        </td>
+                                                    </tr>
+                                                    <tr id="salIDTR" runat="server">
+                                                        <td colspan="3" style="border:none;">
+                                                            <table width="100%" style="border:none;">
+                                                                <tr style="border:none;">
+                                                                    <td width="35%" style="text-align:left;padding-left:10px;border:none;">
+                                                                        <asp:Label ID="lblSalName" runat="server" Font-Names="Verdana" Font-Size="Small">Last Month Salary</asp:Label>&nbsp; <span class="Star">*</span>
+                                                                    </td>
+                                                                    <td width="30%" style="text-align:left;border:none;">
+                                                                        <asp:DropDownList ID="drpLastMonth" runat="server" AutoPostBack="false" CssClass="form-control drpHeight" Width="80%">
+                                                                            <asp:ListItem Value="0" Text="--Select--"></asp:ListItem>
+                                                                            <asp:ListItem Value="1" Text="Jan"></asp:ListItem>
+                                                                            <asp:ListItem Value="2" Text="Feb"></asp:ListItem>
+                                                                            <asp:ListItem Value="3" Text="March"></asp:ListItem>
+                                                                            <asp:ListItem Value="4" Text="April"></asp:ListItem>
+                                                                            <asp:ListItem Value="5" Text="May"></asp:ListItem>
+                                                                            <asp:ListItem Value="6" Text="June"></asp:ListItem>
+                                                                            <asp:ListItem Value="7" Text="July"></asp:ListItem>
+                                                                            <asp:ListItem Value="8" Text="Aug"></asp:ListItem>
+                                                                            <asp:ListItem Value="9" Text="Sept."></asp:ListItem>
+                                                                            <asp:ListItem Value="10" Text="Oct."></asp:ListItem>
+                                                                            <asp:ListItem Value="11" Text="Nov."></asp:ListItem>
+                                                                            <asp:ListItem Value="12" Text="Dec."></asp:ListItem>
+                                                                        </asp:DropDownList>
+                                                                        <asp:RequiredFieldValidator ID="RequiredFieldValidator39" ControlToValidate="drpLastMonth" ErrorMessage="Select Last Month for which you want to save the Salary" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                                    </td>
+                                                                    <td width="30%" style="border:none;padding-right:10px;">
+                                                                        <telerik:RadTextBox runat="server" Width="100%" ClientEvents-OnValueChanged="calsam" ClientEvents-OnKeyPress="OnKeyPress" ID="txtrLastMonSalary" AutoCompleteType="None" Text="0">
+                                                                        </telerik:RadTextBox>
+
+                                                                        <asp:RequiredFieldValidator ID="RequiredFieldValidator36" ControlToValidate="txtrLastMonSalary" ErrorMessage="Last Month Salary should be mentioned against the selected Month" runat="server" Display="None" ValidationGroup="Submit" SetFocusOnError="true"></asp:RequiredFieldValidator>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td height="15px" style="border:none;"></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td width="35%" style="text-align:left;padding-left:10px;border:none;">
+                                                                        <asp:Label ID="lblSecMonthSal" runat="server" Font-Names="Verdana" Font-Size="Small">Second Last Month Salary</asp:Label>
+                                                                    </td>
+                                                                    <td width="30%" style="text-align:left;border:none;">
+                                                                        <asp:DropDownList ID="drpSecLastMonth" runat="server" AutoPostBack="false" CssClass="form-control drpHeight" Width="80%">
+                                                                            <asp:ListItem Value="0" Text="--Select--"></asp:ListItem>
+                                                                            <asp:ListItem Value="1" Text="Jan"></asp:ListItem>
+                                                                            <asp:ListItem Value="2" Text="Feb"></asp:ListItem>
+                                                                            <asp:ListItem Value="3" Text="March"></asp:ListItem>
+                                                                            <asp:ListItem Value="4" Text="April"></asp:ListItem>
+                                                                            <asp:ListItem Value="5" Text="May"></asp:ListItem>
+                                                                            <asp:ListItem Value="6" Text="June"></asp:ListItem>
+                                                                            <asp:ListItem Value="7" Text="July"></asp:ListItem>
+                                                                            <asp:ListItem Value="8" Text="Aug"></asp:ListItem>
+                                                                            <asp:ListItem Value="9" Text="Sept."></asp:ListItem>
+                                                                            <asp:ListItem Value="10" Text="Oct."></asp:ListItem>
+                                                                            <asp:ListItem Value="11" Text="Nov."></asp:ListItem>
+                                                                            <asp:ListItem Value="12" Text="Dec."></asp:ListItem>
+                                                                        </asp:DropDownList>
+                                                                        <asp:RequiredFieldValidator ID="RequiredFieldValidator53" ControlToValidate="drpSecLastMonth" ErrorMessage="Select Second Last Month for which you want to save the Salary" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                                    </td>
+                                                                    <td width="30%" style="border:none;padding-right:10px;">
+                                                                        <telerik:RadTextBox runat="server" Width="100%" ClientEvents-OnValueChanged="calsam" ClientEvents-OnKeyPress="OnKeyPress" ID="txtrSecLastMonthSalary" AutoCompleteType="None" Text="0"></telerik:RadTextBox>
+                                                                        <%--<asp:TextBox ID="txtSecLastMonthSalary" runat="server" CssClass="form-control" Font-Size="Small" Font-Names="Verdana"></asp:TextBox>--%>
+                                                                        <asp:RequiredFieldValidator ID="RequiredFieldValidator38" ControlToValidate="txtrSecLastMonthSalary" ErrorMessage="Second Last Month Salary should be mentioned against the selected Month." runat="server" Display="None" ValidationGroup="Submit" SetFocusOnError="true"></asp:RequiredFieldValidator>
+
+
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td height="15px" style="border:none;"></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td width="35%" style="text-align:left;padding-left:10px;border:none;">
+                                                                        <asp:Label ID="lblThirdLastMonSal" runat="server" Font-Names="Verdana" Font-Size="Small">Third Last Month Salary</asp:Label>
+                                                                    </td>
+                                                                    <td width="30%" style="text-align:left;border:none;">
+                                                                        <asp:DropDownList ID="drpThirdMonthSalary" runat="server" AutoPostBack="false" CssClass="form-control drpHeight" Width="80%">
+                                                                            <asp:ListItem Value="0" Text="--Select--"></asp:ListItem>
+                                                                            <asp:ListItem Value="1" Text="Jan"></asp:ListItem>
+                                                                            <asp:ListItem Value="2" Text="Feb"></asp:ListItem>
+                                                                            <asp:ListItem Value="3" Text="March"></asp:ListItem>
+                                                                            <asp:ListItem Value="4" Text="April"></asp:ListItem>
+                                                                            <asp:ListItem Value="5" Text="May"></asp:ListItem>
+                                                                            <asp:ListItem Value="6" Text="June"></asp:ListItem>
+                                                                            <asp:ListItem Value="7" Text="July"></asp:ListItem>
+                                                                            <asp:ListItem Value="8" Text="Aug"></asp:ListItem>
+                                                                            <asp:ListItem Value="9" Text="Sept."></asp:ListItem>
+                                                                            <asp:ListItem Value="10" Text="Oct."></asp:ListItem>
+                                                                            <asp:ListItem Value="11" Text="Nov."></asp:ListItem>
+                                                                            <asp:ListItem Value="12" Text="Dec."></asp:ListItem>
+                                                                        </asp:DropDownList>
+                                                                        <asp:RequiredFieldValidator ID="RequiredFieldValidator54" ControlToValidate="drpThirdMonthSalary" ErrorMessage="Select Last Third Month for which you want to save the Salary" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                                    </td>
+                                                                    <td width="30%" style="border:none;padding-right:10px;">
+
+                                                                        <asp:TextBox ID="txtmLastThirdMonSalary" runat="server" CssClass="form-control" Font-Size="Small" Font-Names="Verdana" AutoPostBack="true" OnTextChanged="txtmLastThirdMonSalary_TextChanged"></asp:TextBox>
+                                                                        <asp:RequiredFieldValidator ID="RequiredFieldValidator35" ControlToValidate="txtmLastThirdMonSalary" ErrorMessage="Third Last Month Salary should be mentioned against the selected Month." runat="server" Display="None" ValidationGroup="Submit" SetFocusOnError="true"></asp:RequiredFieldValidator>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr id="salSlipTr1" runat="server">
+                                                                    <td height="15px" style="border:none;"></td>
+                                                                </tr>
+                                                                <tr id="salSlipTr2" runat="server">
+                                                                    <td width="35%" style="text-align:left;padding-left:10px;border:none;">
+                                                                        <asp:Label ID="lblCust_EligibleFor" runat="server" Font-Names="Verdana" Font-Size="Small">Customer Eligible For</asp:Label>
+                                                                    </td>
+                                                                    <td width="30%" style="text-align:left;border:none;">
+                                                                        <asp:Label ID="lblAgeFactor" runat="server" Font-Names="Verdana" Font-Size="Small"></asp:Label>
+                                                                    </td>
+                                                                    <td width="30%" style="border:none;padding-right:10px;">
+                                                                        <telerik:RadTextBox runat="server" ReadOnly="true" CssClass="form-control" Font-Size="Small" Width="100%" ID="txtRadCustEligibleFor" AutoCompleteType="None" EmptyMessage="Enter Annual Sal">
+                                                                        </telerik:RadTextBox>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                    <tr id="blanTr" runat="server">
+                                                        <td height="15px" style="border:none;">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="EntryFormRowField" style="border:none;">
+
+                                                            <span>
+                                                                <asp:Label ID="sal1" runat="server" Text="Last Month Salary"></asp:Label>
+                                                            </span><span id="spanBnkSt1" runat="server" class="Star">*</span>
+                                                            <br />
+                                                            <telerik:RadTextBox runat="server" Width="100%" ClientEvents-OnValueChanged="calsam" ClientEvents-OnKeyPress="OnKeyPress" ID="txtRadLastMonSal" AutoCompleteType="None" Text="0">
+                                                            </telerik:RadTextBox>
+                                                            <asp:RequiredFieldValidator ID="RequiredFieldValidator47" runat="server" ControlToValidate="txtRadLastMonSal" ErrorMessage="Last Month Salary is Required" ValidationGroup="Submit" Display="None" SetFocusOnError="true"></asp:RequiredFieldValidator>
+                                                            <telerik:RadTextBox runat="server" Width="100%" ClientEvents-OnValueChanged="calsam" ClientEvents-OnKeyPress="OnKeyPress" ID="txtRadGrossAY_2021" AutoCompleteType="None" Text="0">
+                                                            </telerik:RadTextBox>
+                                                            <asp:RequiredFieldValidator ID="RequiredFieldValidator48" runat="server" ControlToValidate="txtRadGrossAY_2021" ErrorMessage="AY 20/21 Value for ITR is Required" ValidationGroup="Submit" Display="None" SetFocusOnError="true"></asp:RequiredFieldValidator>
+                                                            <telerik:RadTextBox runat="server" Width="100%" ClientEvents-OnValueChanged="calsam" ClientEvents-OnKeyPress="OnKeyPress" ID="txtRadForm16AY_2021" AutoCompleteType="None" Text="0">
+                                                            </telerik:RadTextBox>
+                                                            <asp:RequiredFieldValidator ID="RequiredFieldValidator49" runat="server" ControlToValidate="txtRadForm16AY_2021" ErrorMessage="AY 20/21 Value for Form 16 is Required" ValidationGroup="Submit" Display="None" SetFocusOnError="true"></asp:RequiredFieldValidator>
+                                                            <telerik:RadTextBox runat="server" Width="100%" ClientEvents-OnValueChanged="calsam" ClientEvents-OnKeyPress="OnKeyPress" ID="txtBankStatementLAstMonthSal" AutoCompleteType="None" Text="0">
+                                                            </telerik:RadTextBox>
+                                                            <asp:RequiredFieldValidator ID="RequiredFieldValidator50" runat="server" ControlToValidate="txtBankStatementLAstMonthSal" ErrorMessage="Last Month Salary Value as per Bank Statement is Required" ValidationGroup="Submit" Display="None" SetFocusOnError="true"></asp:RequiredFieldValidator>
+                                                            <telerik:RadTextBox runat="server" Width="100%" AutoPostBack="true" ID="txtRadCrifIncome" AutoCompleteType="None" Text="0" OnTextChanged="txtRadCrifIncome_TextChanged" ClientEvents-OnKeyPress="OnKeyPress">
+                                                            </telerik:RadTextBox>
+                                                            <asp:RequiredFieldValidator ID="RequiredFieldValidator51" runat="server" ControlToValidate="txtRadCrifIncome" ErrorMessage="Crif Income is Required" ValidationGroup="Submit" Display="None" SetFocusOnError="true"></asp:RequiredFieldValidator>
+                                                            <telerik:RadTextBox runat="server" Width="100%" ID="txtRadCTC" AutoCompleteType="None" Text="0" AutoPostBack="true" OnTextChanged="txtRadCTC_TextChanged" ClientEvents-OnKeyPress="OnKeyPress">
+                                                            </telerik:RadTextBox>
+                                                            <asp:RequiredFieldValidator ID="RequiredFieldValidator52" runat="server" ControlToValidate="txtRadCTC" ErrorMessage="Annual CTC(Salary) Value is Required" ValidationGroup="Submit" Display="None" SetFocusOnError="true"></asp:RequiredFieldValidator>
+                                                        </td>
+                                                        <td height="15%" style="border:none;"></td>
+                                                        <td class="EntryFormRowField" style="border:none;">
+                                                            <span>
+
+
+
+                                                                <asp:Label ID="sal2" runat="server" Text="Last Second Month Salary"></asp:Label>
+                                                            </span> <span id="spanBnkSt2" runat="server" class="Star">*</span>
+                                                            <br />
+                                                            <telerik:RadTextBox runat="server" Width="100%" ClientEvents-OnKeyPress="OnKeyPress" ClientEvents-OnValueChanged="calsam" ID="txtRadSecLastMonSal" AutoCompleteType="None" Text="0">
+                                                            </telerik:RadTextBox>
+                                                            <asp:RequiredFieldValidator ID="RequiredFieldValidator46" runat="server" ControlToValidate="txtRadSecLastMonSal" ErrorMessage="Second Last Month Salary is Required" ValidationGroup="Submit" Display="None" SetFocusOnError="true"></asp:RequiredFieldValidator>
+                                                            <telerik:RadTextBox runat="server" Width="100%" ClientEvents-OnKeyPress="OnKeyPress" ClientEvents-OnValueChanged="calsam" ID="txtRadGrossAY_1920" AutoCompleteType="None" Text="0">
+                                                            </telerik:RadTextBox>
+                                                            <asp:RequiredFieldValidator ID="RequiredFieldValidator42" runat="server" ControlToValidate="txtRadGrossAY_1920" ErrorMessage="AY 19/20 Value for ITR is Required" ValidationGroup="Submit" Display="None" SetFocusOnError="true"></asp:RequiredFieldValidator>
+                                                            <telerik:RadTextBox runat="server" Width="100%" ID="txtRadForm16AY_1920" AutoPostBack="true" AutoCompleteType="None" Text="0" OnTextChanged="txtRadForm16AY_1920_TextChanged" ClientEvents-OnKeyPress="OnKeyPress">
+                                                            </telerik:RadTextBox>
+                                                            <asp:RequiredFieldValidator ID="RequiredFieldValidator43" runat="server" ControlToValidate="txtRadForm16AY_1920" ErrorMessage="AY 19/20 Value for Form 16 is Required" ValidationGroup="Submit" Display="None" SetFocusOnError="true"></asp:RequiredFieldValidator>
+                                                            <telerik:RadTextBox runat="server" Width="100%" ClientEvents-OnKeyPress="OnKeyPress" ClientEvents-OnValueChanged="calsam" ID="txtBankStatementSecLAstMonthSal" AutoCompleteType="None" Text="0">
+                                                            </telerik:RadTextBox>
+                                                            <asp:RequiredFieldValidator ID="RequiredFieldValidator44" runat="server" ControlToValidate="txtBankStatementSecLAstMonthSal" ErrorMessage="Second Last Month Salary Value as per Bank Statement is Required" ValidationGroup="Submit" Display="None" SetFocusOnError="true"></asp:RequiredFieldValidator>
+                                                            <telerik:RadTextBox runat="server" Width="100%" ClientEvents-OnKeyPress="OnKeyPress" ClientEvents-OnValueChanged="calsam" ID="txtRadCrifScore" AutoCompleteType="None" Text="0">
+                                                            </telerik:RadTextBox>
+                                                            <asp:RequiredFieldValidator ID="RequiredFieldValidator45" runat="server" ControlToValidate="txtRadCrifScore" ErrorMessage="Crif Score value is Required" ValidationGroup="Submit" Display="None" SetFocusOnError="true"></asp:RequiredFieldValidator>
+                                                            <telerik:RadTextBox runat="server" Width="100%" ClientEvents-OnKeyPress="OnKeyPress" ClientEvents-OnValueChanged="calsam" ID="txtRadCTC_CustEligible" AutoCompleteType="None" Text="0">
+                                                            </telerik:RadTextBox>
+                                                            <%--<asp:RequiredFieldValidator ID="RequiredFieldValidator46" runat="server" ControlToValidate="txtBankStatementSecLAstMonthSal" ErrorMessage="Second Last Month Salary Value as per Bank Statement is Required" ValidationGroup="Submit" Display="None" SetFocusOnError="true"></asp:RequiredFieldValidator>--%>
+                                                        </td>
+                                                    </tr>
+
+
+
+                                                    <tr>
+                                                        <td height="15px" style="border:none;">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="EntryFormRowField" style="border:none;">
+                                                            <span>
+                                                                <asp:Label ID="sal3" runat="server" Text="Last Third Month Salary"></asp:Label>
+                                                            </span>  <span id="spanBnkSt3" runat="server" class="Star">*</span>
+                                                            <br />
+                                                            <telerik:RadTextBox runat="server" Width="100%" ID="txtRadThirdLastMonSal" AutoCompleteType="None" Text="0" AutoPostBack="true" OnTextChanged="txtRadThirdLastMonSal_TextChanged">
+                                                            </telerik:RadTextBox>
+                                                            <telerik:RadTextBox runat="server" Width="100%" ID="txtRadGross_1819" AutoCompleteType="None" Text="0">
+                                                            </telerik:RadTextBox>
+
+                                                            <telerik:RadTextBox runat="server" Width="100%" ID="txtRadForm16AY_1819" AutoCompleteType="None" Text="0" AutoPostBack="true" OnTextChanged="txtRadForm16AY_1819_TextChanged">
+                                                            </telerik:RadTextBox>
+                                                            <asp:Label ID="lblForm16AgeFactor" runat="server" Font-Names="Verdana" Font-Size="Small"></asp:Label>
+                                                            <asp:Label ID="lblCibilAgeFactor" runat="server" Font-Names="Verdana" Font-Size="Small"></asp:Label>
+                                                            <telerik:RadTextBox runat="server" ClientEvents-OnKeyPress="OnKeyPress" ClientEvents-OnValueChanged="calsam" Width="100%" ID="txtBankStatementThirdLAstMonthSal" AutoCompleteType="None" Text="0">
+                                                            </telerik:RadTextBox>
+                                                        </td>
+                                                        <td style="border:none;"></td>
+                                                        <td class="EntryFormRowField" style="border:none;">
+                                                            <span>
+                                                                <asp:Label ID="sal4" runat="server" Text="Customer eligible for"></asp:Label>
+                                                            </span>  <span id="spanBnkSt4" runat="server" class="Star">*</span>
+                                                            <br />
+
+                                                            <telerik:RadTextBox runat="server" ReadOnly="true" Width="100%" ID="txtRadGrossAY_CustEligibleFor" AutoCompleteType="None">
+                                                            </telerik:RadTextBox>
+
+                                                            <telerik:RadTextBox runat="server" ReadOnly="true" Width="100%" ID="txtRadForm16_CustEligibleFor" AutoCompleteType="None">
+                                                            </telerik:RadTextBox>
+                                                            <telerik:RadTextBox runat="server" ReadOnly="true" Width="100%" ID="txtCibil_CustEligibleFor" AutoCompleteType="None">
+                                                            </telerik:RadTextBox>
+
+                                                        </td>
+
+
+                                                    </tr>
+                                                    <tr>
+                                                        <td height="15px" style="border:none;"></td>
+                                                    </tr>
+
+
+                                                    <tr id="c1" runat="server">
+
+
+
+                                                        <td style="border:none;text-align:left;">
+                                                            <span id="coi1"> COI 20/21 </span><span class="Star">*</span>
+                                                            <br />
+                                                            <telerik:RadTextBox runat="server" Width="100%" ID="txtRaadCOI2021" AutoCompleteType="None" Text="0" ClientEvents-OnKeyPress="OnKeyPress">
+                                                            </telerik:RadTextBox>
+                                                            <asp:RequiredFieldValidator ID="reqCOI2021" runat="server" ControlToValidate="txtRaadCOI2021" ErrorMessage="COI2021 Value is Required" ValidationGroup="Submit" Display="None" SetFocusOnError="true"></asp:RequiredFieldValidator>
+
+                                                        </td>
+                                                        <td style="border:none;"></td>
+                                                        <td style="border:none;text-align:left;">
+                                                            <span id="coi2"> COI 19/20 </span> <span class="Star">*</span>
+                                                            <br />
+                                                            <telerik:RadTextBox runat="server" Width="100%" ClientEvents-OnKeyPress="OnKeyPress" ClientEvents-OnValueChanged="calsam" ID="txtRadCOI1920" AutoCompleteType="None" Text="0">
+                                                            </telerik:RadTextBox>
+                                                            <asp:RequiredFieldValidator ID="RequiredFieldValidator40" runat="server" ControlToValidate="txtRadCOI1920" ErrorMessage="COI1920 Value requied" ValidationGroup="Submit" Display="None" SetFocusOnError="true"></asp:RequiredFieldValidator>
+                                                        </td>
+
+                                                    </tr>
+                                                    <tr>
+                                                        <td height="15px" style="border:none;">
+                                                        </td>
+                                                    </tr>
+                                                    <tr id="c2" runat="server">
+                                                        <td style="border:none;text-align:left;">
+                                                            <span id="coi3">COI 18/19 </span>  <span class="Star">*</span>
+                                                            <br />
+                                                            <telerik:RadTextBox runat="server" Width="100%" ID="txtRadCOI1819" AutoCompleteType="None" Text="0" AutoPostBack="true" OnTextChanged="txtRadCOI1819_TextChanged" ClientEvents-OnKeyPress="OnKeyPress">
+                                                            </telerik:RadTextBox>
+                                                            <asp:RequiredFieldValidator ID="RequiredFieldValidator41" runat="server" ControlToValidate="txtRadCOI1819" ErrorMessage="COI1819 Value required" ValidationGroup="Submit" Display="None" SetFocusOnError="true"></asp:RequiredFieldValidator>
+                                                        </td>
+
+                                                        <td class="EntryFormRowField" style="border:none;">
+                                                        </td>
+                                                        <td style="border:none;text-align:left;">
+                                                            <asp:Label ID="lblITRAgeFactor" runat="server" Font-Size="Small" Font-Names="Verdana"></asp:Label>
+                                                        </td>
+
+                                                    </tr>
+                                                </table>
+                                            </ContentTemplate>
+                                            <Triggers>
+                                                <asp:AsyncPostBackTrigger ControlID="DrpRadSalSlipFinDoc1" EventName="SelectedIndexChanged" />
+                                            </Triggers>
+                                        </asp:UpdatePanel>
+
+
+
+                                    </div>
+
+                                    <div class="tab-pane fade in" id="tab3info">
+                                        <asp:UpdatePanel ID="updPnl2" runat="server">
+                                            <ContentTemplate>
+                                                <div class="row rowGap">
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Proposal No &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadTextBox runat="server" ClientEvents-OnFocus="enablebutton" ID="txtProposalNo" EmptyMessage="Enter Proposal No" AutoCompleteType="None"
+                                                                                    Width="100%">
+                                                                </telerik:RadTextBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator16" ControlToValidate="txtProposalNo"
+                                                                                            ErrorMessage="Proposal No is required" runat="server" Display="None" ValidationGroup="Submit">
+                                                                </asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Customer Name &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadTextBox ID="txtCustomerName" runat="server" Width="100%" AuFinancitoCompleteType="None" EmptyMessage="Enter Customer Name"></telerik:RadTextBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator17" ControlToValidate="txtCustomerName" ErrorMessage="Customer Name is required" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row rowGap">
+                                                    <div class="col-md-12">
+                                                        <div class="row EntryFormRow">
+                                                            <div class="col-md-12 textPadding">
+                                                                Kick Out
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadTextBox runat="server" ID="txtkick" EmptyMessage="Enter Requirement " Height="100px" TextMode="MultiLine" AutoCompleteType="None" Width="100%"> </telerik:RadTextBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator30" ControlToValidate="txtkick" ErrorMessage="Kick Out  is required" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row rowGap">
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Gender &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadComboBox RenderMode="Lightweight" Width="100%" ID="RcbGender" runat="server" EnableLoadOnDemand="true" EmptyMessage="Select Gender">
+                                                                    <Items>
+                                                                        <telerik:RadComboBoxItem Text="Male" Value="Male" />
+                                                                        <telerik:RadComboBoxItem Text="FeMale" Value="FeMale" />
+                                                                    </Items>
+                                                                </telerik:RadComboBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator18" ControlToValidate="RcbGender"
+                                                                                            ErrorMessage="Gender  is required" runat="server" Display="None" ValidationGroup="Submit">
+                                                                </asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Age as per system &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadTextBox ID="txtAge" runat="server" Width="100%" AutoCompleteType="None" EmptyMessage="Enter Age" AutoPostBack="true" OnTextChanged="txtAge_TextChanged" ClientEvents-OnKeyPress="OnKeyPress2" InputType="Number"></telerik:RadTextBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator19" ControlToValidate="txtAge" ErrorMessage="Age is required" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                                <asp:RegularExpressionValidator ID="ageCharLength" runat="server" ControlToValidate="txtAge" ValidationExpression="^[0-9]{1,3}$" ValidationGroup="Submit" ErrorMessage="Character limit upto 3"></asp:RegularExpressionValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row rowGap">
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Education &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadComboBox RenderMode="Lightweight" ID="RCBEducation" runat="server"
+                                                                                     AutoPostBack="false" Width="100%" EmptyMessage="Select Education">
+                                                                </telerik:RadComboBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator20" ControlToValidate="RCBEducation" ErrorMessage="Education is required"
+                                                                                            runat="server" Display="None" ValidationGroup="Submit">
+                                                                </asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                KYC &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadComboBox RenderMode="Lightweight" ID="radkyc" runat="server" EnableLoadOnDemand="true" EmptyMessage="Select KYC" Width="100%">
+                                                                    <Items>
+                                                                        <telerik:RadComboBoxItem Text="Yes" Value="Yes" />
+                                                                        <telerik:RadComboBoxItem Text="No" Value="No" />
+                                                                    </Items>
+                                                                </telerik:RadComboBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator21" ControlToValidate="radkyc" ErrorMessage="KYC is required" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row rowGap">
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                ID Proof &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadComboBox RenderMode="Lightweight" Width="100%" ID="RadPhotoIdentity" runat="server"
+                                                                                     EmptyMessage="Select Identity Proof">
+                                                                </telerik:RadComboBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator22" ControlToValidate="RadPhotoIdentity"
+                                                                                            ErrorMessage="ID Proof is required" runat="server" Display="None" ValidationGroup="Submit">
+                                                                </asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Address Proof &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadComboBox RenderMode="Lightweight" Width="100%" ID="RadProofResidence" runat="server"
+                                                                                     EmptyMessage="Select Address Proof">
+                                                                </telerik:RadComboBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator23" ControlToValidate="RadProofResidence" ErrorMessage="Address Proof is required" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div style="display:none;" class="row rowGap">
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                ID Proof &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadComboBox RenderMode="Lightweight" Width="100%" ID="cmbRadIDPRoof" runat="server"
+                                                                                     EmptyMessage="Select Identity Proof">
+                                                                </telerik:RadComboBox>
+                                                                <%--<asp:RequiredFieldValidator ID="RequiredFieldValidator35" ControlToValidate="cmbRadIDPRoof"
+                                                                                                ErrorMessage="ID Proof is required" runat="server" Display="None" ValidationGroup="Submit">
+                                                                </asp:RequiredFieldValidator>--%>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <%--<div class="row rowGap">
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Adhar Card &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12 text-left">
+                                                                <asp:TextBox ID="txtAdharCardNo" runat="server" CssClass="form-control"></asp:TextBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator5" ControlToValidate="RadPhotoIdentity"
+                                                                                            ErrorMessage="ID Proof is required" runat="server" Display="None" ValidationGroup="Submit">
+                                                                </asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                <asp:RadioButtonList ID="rdbConsentList" runat="server" TextAlign="Right" Width="100%" RepeatDirection="Horizontal">
+                                                                    <asp:ListItem Text="Consent" Value="C"></asp:ListItem>
+                                                                    <asp:ListItem Text="Non-Consent" Value="N"></asp:ListItem>
+                                                                </asp:RadioButtonList>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <asp:LinkButton ID="lnkVerifyAdhar" runat="server" Text="Verify" Font-Underline="false" Font-Names="Verdana" OnClick="lnkVerifyAdhar_Click"></asp:LinkButton>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>--%>
+
+                                                <div class="row rowGap">
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Photo &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadComboBox RenderMode="Lightweight" ID="radPhoto" runat="server" EnableLoadOnDemand="true" EmptyMessage="Select Photo" Width="100%">
+                                                                    <Items>
+                                                                        <telerik:RadComboBoxItem Text="Yes" Value="Yes" />
+                                                                        <telerik:RadComboBoxItem Text="No" Value="No" />
+                                                                    </Items>
+                                                                </telerik:RadComboBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator24" ControlToValidate="radPhoto"
+                                                                                            ErrorMessage="Photo is required" runat="server" Display="None" ValidationGroup="Submit">
+                                                                </asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Pin code &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadTextBox runat="server" AutoPostBack="true" OnTextChanged="txtpincode_TextChanged" ClientEvents-OnKeyPress="OnKeyPress1" ID="txtpincode" EmptyMessage="Enter Pin Code" AutoCompleteType="None"
+                                                                                    Width="100%">
+                                                                </telerik:RadTextBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator25" ControlToValidate="txtpincode" ErrorMessage="Pincode is required" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                                <%--<asp:RegularExpressionValidator ID="regExPinCode" runat="server" ControlToValidate="txtpincode" ValidationExpression="^[0-9]{6}$" ErrorMessage="Pin Code must be of 6 numeric characters only" Display="None" ValidationGroup="Submi"></asp:RegularExpressionValidator>--%>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row rowGap">
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                City &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadTextBox runat="server" AutoPostBack="true" OnTextChanged="txtcity_TextChanged" ID="txtcity" EmptyMessage="Enter City" AutoCompleteType="None"
+                                                                                    Width="100%">
+                                                                </telerik:RadTextBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator26" ControlToValidate="txtcity"
+                                                                                            ErrorMessage="City is required" runat="server" Display="None" ValidationGroup="Submit">
+                                                                </asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Vsm City &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <asp:DropDownList id="txtvsmcity" Height="32px" Width="100%" runat="server">
+                                                                    <asp:ListItem Text="Yes" Value="Yes"></asp:ListItem>
+                                                                    <asp:ListItem Text="No" Value="No"></asp:ListItem>
+                                                                    <asp:ListItem Text="Not Applicable" Value="N"></asp:ListItem>
+                                                                </asp:DropDownList>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator27" ControlToValidate="txtvsmcity" ErrorMessage="Vsm city is required" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row rowGap">
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Occupation &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadComboBox RenderMode="Lightweight" ID="Radtxtemployee" runat="server" OnClientSelectedIndexChanged="Changetext" EnableLoadOnDemand="true"
+                                                                                     EmptyMessage="Select Occupation" Width="100%">
+                                                                    <Items>
+                                                                        <telerik:RadComboBoxItem Text="Salaried" Value="Salaried" />
+                                                                        <telerik:RadComboBoxItem Text="Self-employed" Value="Self-employed" />
+                                                                        <telerik:RadComboBoxItem Text="Professional" Value="Professional" />
+                                                                        <telerik:RadComboBoxItem Text="Housewife" Value="Housewife" />
+                                                                        <telerik:RadComboBoxItem Text="Others" Value="Others" />
+                                                                    </Items>
+                                                                </telerik:RadComboBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator9" ControlToValidate="Radtxtemployee" ErrorMessage="Occupation is required"
+                                                                                            runat="server" Display="None" ValidationGroup="Submit">
+                                                                </asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Declared Income &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadTextBox runat="server" ID="txtDeclaredIncome" EmptyMessage="Enter DeclaredIncome" ClientEvents-OnValueChanged="changecolor" ClientEvents-OnKeyPress="OnKeyPress" AutoCompleteType="None"
+                                                                                    Width="100%">
+                                                                </telerik:RadTextBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator8" ControlToValidate="txtDeclaredIncome" ErrorMessage="DeclaredIncome is required" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                            </div>
+                                                            <br />
+                                                            <br />
+                                                            <div class="col-md-12 textPadding">
+                                                                Financial Sum Assured &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadTextBox ID="txtFSA" runat="server" ClientEvents-OnKeyPress="OnKeyPress1" Width="100%" AutoCompleteType="None" EmptyMessage="Enter Financial Sum Assured"></telerik:RadTextBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator3" ControlToValidate="txtFSA" ErrorMessage="Financial Sum Assured is required" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row rowGap">
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Med Sum Assured &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadTextBox runat="server" ClientEvents-OnValueChanged="Medicaltest" ClientEvents-OnKeyPress="OnKeyPress1" ID="txtMSA" EmptyMessage="Enter Med Sum Assured" AutoCompleteType="None"
+                                                                                    Width="100%">
+                                                                </telerik:RadTextBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator2" ControlToValidate="txtMSA"
+                                                                                            ErrorMessage="Med Sum Assured is required" runat="server" Display="None" ValidationGroup="Submit">
+                                                                </asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row rowGap">
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Total Financial Sum Assured (TFSA) &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadTextBox runat="server" ClientEvents-OnValueChanged="Medicaltest" ClientEvents-OnKeyPress="OnKeyPress1" ID="txtRadTFSA" EmptyMessage="Enter Total Financial Sum Assured" AutoCompleteType="None"
+                                                                                    Width="100%">
+                                                                </telerik:RadTextBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator34" ControlToValidate="txtRadTFSA"
+                                                                                            ErrorMessage="Total Financial Sum Assured is required" runat="server" Display="None" ValidationGroup="Submit">
+                                                                </asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Applied Sum Assured &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadTextBox ID="txtAppliedSumAssured" ClientEvents-OnValueChanged="Medicaltest" runat="server" Width="100%" ClientEvents-OnKeyPress="OnKeyPress1" AutoCompleteType="None" EmptyMessage="Enter Applied Sum Assured "></telerik:RadTextBox>
+                                                                <asp:RequiredFieldValidator ID="RFVtxtPhone" ControlToValidate="txtAppliedSumAssured" ErrorMessage="Applied Sum Assured is required" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row rowGap">
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Previous Policy MLI Sum Assured &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadTextBox ID="txtPreviousPolicyMLISumAssured" ClientEvents-OnKeyPress="OnKeyPress1" runat="server" Width="100%" AutoCompleteType="None" EmptyMessage="Enter Previous Policy MLI Sum Assured"></telerik:RadTextBox>
+                                                                <asp:RequiredFieldValidator ID="reqPrevPolicyMLISA" runat="server" ControlToValidate="txtPreviousPolicyMLISumAssured" ErrorMessage="Previous Policy MLI Sum Assured is required" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Previous Policy Other Sum Assured &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadTextBox runat="server" ID="txtExistingSumAssuredOther" ClientEvents-OnKeyPress="OnKeyPress1" EmptyMessage="Enter Existing Sum Assured Other" AutoCompleteType="None"
+                                                                                    Width="100%">
+                                                                </telerik:RadTextBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator5" runat="server" ControlToValidate="txtExistingSumAssuredOther" ErrorMessage="Previous Policy Other Sum Assured is required" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <%--<div class="col-md-6">
+                                                        --%>
+                                                        <%--<div class="row">
+                                                            --%>
+                                                            <%--<div class="col-md-12 textPadding">
+                                                                Previous Policy Other &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <asp:DropDownList AutoPostBack="false" onchange="previouspolicyother()" id="txtPreviousPolicyOther" Height="32px" Width="100%" runat="server">
+                                                                    <asp:ListItem Text="Yes" Value="Yes"></asp:ListItem>
+                                                                    <asp:ListItem Text="No" Value="No"></asp:ListItem>
+                                                                </asp:DropDownList>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator29" ControlToValidate="txtPreviousPolicyOther" ErrorMessage="Previous Policy Other  is required" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                            </div>--%>
+                                                            <%--
+                                                        </div>--%>
+                                                        <%--
+                                                    </div>--%>
+                                                </div>
+
+                                                <%--<div class="row rowGap">
+                                                    --%>
+
+                                                    <%--<div class="col-md-6">
+                                                        <div class="row">
+
+                                                        </div>
+                                                    </div>--%>
+                                                    <%--
+                                                </div>--%>
+
+                                                <%--<div class="row rowGap">
+                                                    --%>
+                                                    <%--<div class="col-md-6">
+                                                        --%>
+                                                        <%--<div class="row">
+                                                            --%>
+                                                            <%--<div class="col-md-12 textPadding">
+                                                                CIBIL Score &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadTextBox ID="txtCrifIncome" runat="server" Width="100%" ClientEvents-OnKeyPress="OnKeyPress" ClientEvents-OnValueChanged="calsam" AutoCompleteType="None" EmptyMessage="Enter Crif Income"></telerik:RadTextBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator32" ControlToValidate="txtCrifIncome" ErrorMessage="Crif Income is required" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                            </div>--%>
+                                                            <%--
+                                                        </div>
+                                                    </div>--%>
+                                                    <%--<div class="col-md-6">
+                                                        <div class="row">
+                                                            --%>
+                                                            <%--<div class="col-md-12 textPadding">
+                                                                As Per CIBIL &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadTextBox ID="txtCibil" runat="server" Width="100%" ClientEvents-OnKeyPress="OnKeyPress1" AutoCompleteType="None" EmptyMessage="Enter Crif Score"></telerik:RadTextBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator7" ControlToValidate="txtCibil" ErrorMessage="Cibil Score is required" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                            </div>--%>
+                                                            <%--
+                                                        </div>
+                                                    </div>--%>
+                                                    <%--
+                                                </div>--%>
+
+                                                <div class="row rowGap">
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Previous Policy MLI &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <asp:DropDownList AutoPostBack="false" RenderMode="Lightweight" onchange="previouspolicy()" id="txtPreviousPolicyMLI" Height="32px" Width="100%" runat="server">
+                                                                    <asp:ListItem Text="Yes" Value="Yes"></asp:ListItem>
+                                                                    <asp:ListItem Text="No" Value="No"></asp:ListItem>
+                                                                </asp:DropDownList>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator28" ControlToValidate="txtPreviousPolicyMLI" ErrorMessage="Previous Policy MLI  is required" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Financial Document &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadComboBox RenderMode="Lightweight" ID="radFinancialDocument" OnClientSelectedIndexChanged="Changetext" runat="server" EnableLoadOnDemand="true"
+                                                                                     EmptyMessage="Select Financial Document" Width="100%">
+                                                                    <Items>
+                                                                        <telerik:RadComboBoxItem Text="Salary Slip" Value="Salary Slip" />
+                                                                        <telerik:RadComboBoxItem Text="ITR" Value="ITR" />
+                                                                        <telerik:RadComboBoxItem Text="Bank statement" Value="Bank statement" />
+                                                                        <telerik:RadComboBoxItem Text="Form 16" Value="Form 16" />
+                                                                        <telerik:RadComboBoxItem Text="APC" Value="As Per CIBIL" />
+                                                                    </Items>
+                                                                </telerik:RadComboBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator6" ControlToValidate="radFinancialDocument" ErrorMessage="FinancialDocument is required" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row rowGap">
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Video MER &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadComboBox RenderMode="Lightweight" ID="Radtetemer" runat="server" EnableLoadOnDemand="true"
+                                                                                     EmptyMessage="Select Tele MER Report" Width="100%">
+                                                                    <Items>
+                                                                        <telerik:RadComboBoxItem Text="Yes" Value="Yes" />
+                                                                        <telerik:RadComboBoxItem Text="No" Value="No" />
+                                                                    </Items>
+                                                                </telerik:RadComboBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator13" ControlToValidate="Radtetemer" ErrorMessage="Tele MER Report is required" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Medical Required &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadComboBox RenderMode="Lightweight" ID="RadMedicalRequired" runat="server" EnableLoadOnDemand="true"
+                                                                                     EmptyMessage="Select MedicalRequired" Width="100%">
+                                                                    <Items>
+                                                                        <telerik:RadComboBoxItem Text="CAT 4B" Value="CAT 4B" />
+                                                                        <telerik:RadComboBoxItem Text="CAT 5" Value="CAT 5" />
+                                                                        <telerik:RadComboBoxItem Text="CAT 6A" Value="CAT 6A" />
+                                                                        <telerik:RadComboBoxItem Text="CAT 6B" Value="CAT 6B" />
+                                                                    </Items>
+                                                                </telerik:RadComboBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator4" ControlToValidate="RadMedicalRequired" ErrorMessage="Medical is required" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row rowGap">
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Medical Received &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadComboBox RenderMode="Lightweight" ID="RadMedicalReceived" runat="server" EnableLoadOnDemand="true"
+                                                                                     EmptyMessage="Select Medical Received" Width="100%">
+                                                                    <Items>
+                                                                        <telerik:RadComboBoxItem Text="CAT4B" Value="CAT4B" />
+                                                                        <telerik:RadComboBoxItem Text="CAT5" Value="CAT5" />
+                                                                        <telerik:RadComboBoxItem Text="CAT6A" Value="CAT6A" />
+                                                                        <telerik:RadComboBoxItem Text="CAT6B" Value="CAT6B" />
+                                                                        <telerik:RadComboBoxItem Text="CAT1" Value="CAT1" />
+                                                                        <telerik:RadComboBoxItem Text="BP1" Value="BP1" />
+                                                                        <telerik:RadComboBoxItem Text="BP2" Value="BP2" />
+                                                                        <telerik:RadComboBoxItem Text="BP3" Value="BP3" />
+                                                                        <telerik:RadComboBoxItem Text="NO" Value="NO" />
+                                                                    </Items>
+                                                                </telerik:RadComboBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator7" ControlToValidate="RadMedicalReceived" ErrorMessage="Medical Received is required" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Medical Report Date &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadDateInput ID="txtDateOfMedical" runat="server" EmptyMessage="dd-mm-yyyy" Culture="" DateFormat="dd-MM-yyyy" MaxDate="12-12-9999" MinDate="01-01-1900"></telerik:RadDateInput>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator29" ControlToValidate="txtDateOfMedical" ErrorMessage="Medical Report Date is required" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                                <%--<asp:RegularExpressionValidator ID="regExDate" runat="server" ControlToValidate="txtDateOfMedical" ValidationExpression="(((0|1)[0-9]|2[0-9]|3[0-1])\-(0[1-9]|1[0-2])\-((19|20)\d\d))$" ErrorMessage="Please Enter Date in DD-MM-YYYY Format" Display="None" ValidationGroup="Submit"></asp:RegularExpressionValidator>--%>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row rowGap">
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Height &nbsp; <span class="Star">*</span>&nbsp;&nbsp;<span class="Star">[in inches only]</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+
+                                                                <telerik:RadTextBox ClientEvents-OnValueChanged="calBMI" runat="server" ID="txtHeightft" ClientEvents-OnKeyPress="OnKeyPress" EmptyMessage="Enter Height" AutoCompleteType="None"
+                                                                                    Width="100%" InputType="Number">
+                                                                </telerik:RadTextBox>
+                                                                <asp:RequiredFieldValidator ID="RFVtxtHeightft" ControlToValidate="txtHeightft"
+                                                                                            ErrorMessage="Height  is required" runat="server" Display="None" ValidationGroup="Submit">
+                                                                </asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Weight &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadTextBox ClientEvents-OnValueChanged="calBMI" runat="server" ID="txtWeight" ClientEvents-OnKeyPress="OnKeyPress" EmptyMessage="Enter Weight" AutoCompleteType="None"
+                                                                                    Width="100%" InputType="Number">
+                                                                </telerik:RadTextBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator11" ControlToValidate="txtWeight"
+                                                                                            ErrorMessage="Weight is required" runat="server" Display="None" ValidationGroup="Submit">
+                                                                </asp:RequiredFieldValidator>
+                                                                <%--<asp:RegularExpressionValidator ID="regExWeight" runat="server" ControlToValidate="txtWeight" ErrorMessage="Weight must be in numeric" ValidationExpression="^[0-9]$" ValidationGroup="Submit"></asp:RegularExpressionValidator>--%>
+                                                                <asp:RangeValidator ID="rangeWeight" runat="server" ControlToValidate="txtWeight" MinimumValue="1" MaximumValue="9999999" ErrorMessage="Weight can neither be 0 nor less than 0" Display="None" ValidationGroup="Submit"></asp:RangeValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row rowGap">
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                BMI &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadTextBox ReadOnly="true" runat="server" ID="txtBMI" EmptyMessage="Enter BMI" AutoCompleteType="None"
+                                                                                    Width="100%">
+                                                                </telerik:RadTextBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator32" ControlToValidate="txtBMI"
+                                                                                            ErrorMessage="BMI is required" runat="server" Display="None" ValidationGroup="Submit">
+                                                                </asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Smoker &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadComboBox RenderMode="Lightweight" ID="rcbIsSmoke" OnClientSelectedIndexChanged="smokar" runat="server" EnableLoadOnDemand="true"
+                                                                                     EmptyMessage="Select IsSmoke" Width="100%">
+                                                                    <Items>
+                                                                        <telerik:RadComboBoxItem Text="Yes" Value="Yes" />
+                                                                        <telerik:RadComboBoxItem Text="No" Value="No" />
+                                                                        <telerik:RadComboBoxItem Text="Disclose" Value="Disclose" />
+                                                                    </Items>
+                                                                </telerik:RadComboBox><span id="stdcon" class="Star" style="display :none ">Smoker rate need to apply</span>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator1" ControlToValidate="rcbIsSmoke"
+                                                                                            ErrorMessage="Smoke is required" runat="server" Display="None" ValidationGroup="Submit">
+                                                                </asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row rowGap">
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Urine Cotinine Test &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadComboBox RenderMode="Lightweight" ID="txtUCT" runat="server" EnableLoadOnDemand="true"
+                                                                                     EmptyMessage="Select UCT" Width="100%">
+                                                                    <Items>
+                                                                        <telerik:RadComboBoxItem Text="Negative" Value="Negative" />
+                                                                        <telerik:RadComboBoxItem Text="Positive" Value="Positive" />
+                                                                        <telerik:RadComboBoxItem Text="No" Value="No" />
+                                                                    </Items>
+                                                                </telerik:RadComboBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator15" ControlToValidate="txtUCT" ErrorMessage="UCT is required" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                ECG Report &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadComboBox RenderMode="Lightweight" ID="txtecg" runat="server" EnableLoadOnDemand="true"
+                                                                                     EmptyMessage="Select ECG Report" Width="100%">
+                                                                    <Items>
+                                                                        <telerik:RadComboBoxItem Text="Normal" Value="Normal" />
+                                                                        <telerik:RadComboBoxItem Text="Refer to CMO" Value="Refer to CMO" />
+                                                                        <telerik:RadComboBoxItem Text="NO" Value="NO" />
+                                                                    </Items>
+                                                                </telerik:RadComboBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator14" ControlToValidate="txtecg" ErrorMessage="ECG Report is required" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row rowGap">
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Blood Profile / CBC Finding &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadTextBox runat="server" ID="txtbloodprofile" TextMode="MultiLine" Height="100px" EmptyMessage="Enter Blood profile / CBC Finding" AutoCompleteType="None"
+                                                                                    Width="100%">
+                                                                </telerik:RadTextBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator12" ControlToValidate="txtbloodprofile" ErrorMessage="Blood profile is required" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Medical Recommendation &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadComboBox RenderMode="Lightweight" ID="ddmedicalrecom" runat="server" EnableLoadOnDemand="true"
+                                                                                     EmptyMessage="Select Medical recommendation" Width="100%" OnClientSelectedIndexChanged="ChangeMedical">
+                                                                    <Items>
+                                                                        <telerik:RadComboBoxItem Text="Medical Ok" Value="Medical Ok" />
+                                                                        <telerik:RadComboBoxItem Text="Other" Value="Other" />
+                                                                    </Items>
+                                                                </telerik:RadComboBox>
+                                                                <telerik:RadTextBox runat="server" Height="100px" TextMode="MultiLine" ID="txtMedicalrecommendation" EmptyMessage="Enter Medical recommendation" AutoCompleteType="None"
+                                                                                    Width="100%">
+                                                                </telerik:RadTextBox>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row rowGap">
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Financial Recommendation &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadComboBox RenderMode="Lightweight" ID="ddfinrecom" runat="server" OnClientSelectedIndexChanged="ChangeFincail" EnableLoadOnDemand="true"
+                                                                                     EmptyMessage="Select Financial recommendation" Width="100%">
+                                                                    <Items>
+                                                                        <telerik:RadComboBoxItem Text="Financial Ok" Value="Financial Ok" />
+                                                                        <telerik:RadComboBoxItem Text="Other" Value="Other" />
+                                                                    </Items>
+                                                                </telerik:RadComboBox>
+                                                                <telerik:RadTextBox runat="server" Height="100px" TextMode="MultiLine" ID="txtFinancialrecommendation" EmptyMessage="Enter Financial recommendation" AutoCompleteType="None" Width="100%"> </telerik:RadTextBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator10" ControlToValidate="ddfinrecom" ErrorMessage="Financial recommendation is required" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <%--<div class="col-md-6">
+                                                        <div class="row EntryFormRow">
+                                                            <div class="col-md-12 textPadding">
+                                                                Eligibility &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadTextBox runat="server" ReadOnly="true" Width="100%" ID="txtannualsal" AutoCompleteType="None" EmptyMessage="Enter Annual Sal">
+                                                                </telerik:RadTextBox>
+                                                            </div>
+                                                        </div>
+                                                    </div>--%>
+                                                </div>
+
+                                                <div class="row rowGap">
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Note &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadTextBox runat="server" ID="txtnote" EmptyMessage="Enter Note " Height="100px" TextMode="MultiLine" AutoCompleteType="None" Width="100%"> </telerik:RadTextBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator31" ControlToValidate="txtnote" ErrorMessage="Note  is required" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12 textPadding">
+                                                                Final Decision &nbsp; <span class="Star">*</span>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <telerik:RadComboBox RenderMode="Lightweight" ID="radFinalDecision" runat="server" EnableLoadOnDemand="true"
+                                                                                     EmptyMessage="Select FinalDecision" Width="100%">
+                                                                    <Items>
+                                                                        <telerik:RadComboBoxItem Text="Accept" Value="Accept" />
+                                                                        <telerik:RadComboBoxItem Text="Decline" Value="Decline" />
+                                                                        <telerik:RadComboBoxItem Text="Counter Offer" Value="Counter Offer" />
+                                                                        <telerik:RadComboBoxItem Text="Postpone" Value="Postpone" />
+                                                                        <telerik:RadComboBoxItem Text="Add Info" Value="Add Info" />
+                                                                        <telerik:RadComboBoxItem Text="Financially Add Info" Value="Financially Add Info" />
+                                                                        <telerik:RadComboBoxItem Text="Medically Add Info" Value="Medically Add Info" />
+                                                                        <telerik:RadComboBoxItem Text="Borderline Accept" Value="Borderline Accept" />
+                                                                        <telerik:RadComboBoxItem Text="Refer to CMO " Value="Refer to CMO" />
+                                                                        <telerik:RadComboBoxItem Text="Refer to URMU" Value="Refer to URMU" />
+                                                                    </Items>
+                                                                </telerik:RadComboBox>
+                                                                <asp:RequiredFieldValidator ID="RequiredFieldValidator33" ControlToValidate="radFinalDecision" ErrorMessage="Final Decision is required" runat="server" Display="None" ValidationGroup="Submit"></asp:RequiredFieldValidator>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </ContentTemplate>
+                                            <Triggers>
+                                                <asp:AsyncPostBackTrigger ControlID="txtAge" EventName="TextChanged" />
+                                            </Triggers>
+                                        </asp:UpdatePanel>
+                                    </div>
+                                </div>
+                                <div style="margin-top:10px;text-align:center;">
+                                    <telerik:RadButton ID="btnSave" runat="server" Text="Save" ValidationGroup="Submit" OnClick="btnSave_Click" BackColor="#0069d9"
+                                                       EnableEmbeddedSkins="false" ForeColor="White">
+                                        <Icon PrimaryIconCssClass="rbSave"></Icon>
+                                    </telerik:RadButton>
+                                    <telerik:RadButton ID="BtnClose" runat="server" Text="Clear" BackColor="Black" ValidationGroup="CLOSE" OnClick="btnClear_Click"
+                                                       EnableEmbeddedSkins="false" ForeColor="White">
+                                        <Icon PrimaryIconCssClass="rbRefresh"></Icon>
+                                    </telerik:RadButton>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

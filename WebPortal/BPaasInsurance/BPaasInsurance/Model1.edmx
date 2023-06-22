@@ -1,0 +1,486 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="InsuranceBPaaSModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Document_Master">
+          <Key>
+            <PropertyRef Name="DocMasterID" />
+          </Key>
+          <Property Name="DocMasterID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PolicyNo" Type="int" Nullable="false" />
+          <Property Name="DocStatusCode" Type="int" />
+          <Property Name="Document_Path" Type="varchar(max)" />
+          <Property Name="DocumentName" Type="varchar" MaxLength="50" />
+          <Property Name="DocType" Type="varchar" MaxLength="50" />
+          <Property Name="DocExtension" Type="varchar" MaxLength="50" />
+          <Property Name="TransID" Type="int" />
+          <Property Name="CreatedDate" Type="datetime" />
+          <Property Name="CreatedBy" Type="varchar" MaxLength="50" />
+          <Property Name="ModifiedDate" Type="datetime" />
+          <Property Name="ModifiedBy" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="KYC_Doc_Master">
+          <Key>
+            <PropertyRef Name="DocID" />
+          </Key>
+          <Property Name="DocID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PolicyNo" Type="int" Nullable="false" />
+          <Property Name="DocType" Type="int" Nullable="false" />
+          <Property Name="Name" Type="varchar" MaxLength="50" />
+          <Property Name="IDNumber" Type="varchar" MaxLength="50" />
+          <Property Name="Address" Type="varchar" MaxLength="200" />
+          <Property Name="DOB" Type="datetime" />
+          <Property Name="CreatedDate" Type="datetime" />
+          <Property Name="CreatedBy" Type="varchar" MaxLength="50" />
+          <Property Name="ModifiedDate" Type="datetime" />
+          <Property Name="ModifiedBy" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="Med_Report_Details">
+          <Key>
+            <PropertyRef Name="ReportDetailsID" />
+          </Key>
+          <Property Name="ReportDetailsID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ReportID" Type="int" Nullable="false" />
+          <Property Name="TestName" Type="varchar" MaxLength="50" />
+          <Property Name="NumericTestValue" Type="numeric" Precision="10" Scale="2" />
+          <Property Name="RangeFrom" Type="numeric" Precision="10" Scale="2" />
+          <Property Name="RangeTill" Type="numeric" Precision="10" Scale="2" />
+          <Property Name="HealthStatus" Type="varchar" MaxLength="50" />
+          <Property Name="CreatedDate" Type="datetime" />
+          <Property Name="CreatedBy" Type="varchar" MaxLength="50" />
+          <Property Name="ModifiedDate" Type="datetime" />
+          <Property Name="ModifiedBy" Type="varchar" MaxLength="50" />
+          <Property Name="StringTestValue" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="Med_Report_Master">
+          <Key>
+            <PropertyRef Name="ReportID" />
+          </Key>
+          <Property Name="ReportID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PolicyNo" Type="int" Nullable="false" />
+          <Property Name="ReportType" Type="varchar" MaxLength="50" />
+          <Property Name="ReportName" Type="varchar" MaxLength="50" />
+          <Property Name="ReportDate" Type="datetime" />
+          <Property Name="Age" Type="int" />
+          <Property Name="CreatedDate" Type="datetime" />
+          <Property Name="CreatedBy" Type="varchar" MaxLength="50" />
+          <Property Name="ModifiedDate" Type="datetime" />
+          <Property Name="ModifiedBy" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="Policy_Master">
+          <Key>
+            <PropertyRef Name="PolicyNo" />
+          </Key>
+          <Property Name="PolicyNo" Type="int" Nullable="false" />
+          <Property Name="PolicyStatusCode" Type="int" />
+          <Property Name="CreatedDate" Type="datetime" />
+          <Property Name="CreatedBy" Type="varchar" MaxLength="50" />
+          <Property Name="ModifiedDate" Type="datetime" />
+          <Property Name="ModifiedBy" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="Type_Master">
+          <Key>
+            <PropertyRef Name="TypeId" />
+          </Key>
+          <Property Name="TypeId" Type="int" Nullable="false" />
+          <Property Name="TypeName" Type="varchar" MaxLength="50" />
+          <Property Name="TypeCategory" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <Association Name="FK__Document___Polic__412EB0B6">
+          <End Role="Policy_Master" Type="Self.Policy_Master" Multiplicity="1" />
+          <End Role="Document_Master" Type="Self.Document_Master" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Policy_Master">
+              <PropertyRef Name="PolicyNo" />
+            </Principal>
+            <Dependent Role="Document_Master">
+              <PropertyRef Name="PolicyNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__KYC_Doc_M__Polic__4222D4EF">
+          <End Role="Policy_Master" Type="Self.Policy_Master" Multiplicity="1" />
+          <End Role="KYC_Doc_Master" Type="Self.KYC_Doc_Master" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Policy_Master">
+              <PropertyRef Name="PolicyNo" />
+            </Principal>
+            <Dependent Role="KYC_Doc_Master">
+              <PropertyRef Name="PolicyNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Med_Repor__Repor__4F7CD00D">
+          <End Role="Med_Report_Master" Type="Self.Med_Report_Master" Multiplicity="1" />
+          <End Role="Med_Report_Details" Type="Self.Med_Report_Details" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Med_Report_Master">
+              <PropertyRef Name="ReportID" />
+            </Principal>
+            <Dependent Role="Med_Report_Details">
+              <PropertyRef Name="ReportID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Med_Repor__Repor__5070F446">
+          <End Role="Med_Report_Master" Type="Self.Med_Report_Master" Multiplicity="1" />
+          <End Role="Med_Report_Details" Type="Self.Med_Report_Details" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Med_Report_Master">
+              <PropertyRef Name="ReportID" />
+            </Principal>
+            <Dependent Role="Med_Report_Details">
+              <PropertyRef Name="ReportID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Policy_Ma__Polic__45F365D3">
+          <End Role="Type_Master" Type="Self.Type_Master" Multiplicity="0..1" />
+          <End Role="Policy_Master" Type="Self.Policy_Master" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Type_Master">
+              <PropertyRef Name="TypeId" />
+            </Principal>
+            <Dependent Role="Policy_Master">
+              <PropertyRef Name="PolicyStatusCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="InsuranceBPaaSModelStoreContainer">
+          <EntitySet Name="Document_Master" EntityType="Self.Document_Master" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="KYC_Doc_Master" EntityType="Self.KYC_Doc_Master" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Med_Report_Details" EntityType="Self.Med_Report_Details" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Med_Report_Master" EntityType="Self.Med_Report_Master" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Policy_Master" EntityType="Self.Policy_Master" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Type_Master" EntityType="Self.Type_Master" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK__Document___Polic__412EB0B6" Association="Self.FK__Document___Polic__412EB0B6">
+            <End Role="Policy_Master" EntitySet="Policy_Master" />
+            <End Role="Document_Master" EntitySet="Document_Master" />
+          </AssociationSet>
+          <AssociationSet Name="FK__KYC_Doc_M__Polic__4222D4EF" Association="Self.FK__KYC_Doc_M__Polic__4222D4EF">
+            <End Role="Policy_Master" EntitySet="Policy_Master" />
+            <End Role="KYC_Doc_Master" EntitySet="KYC_Doc_Master" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Med_Repor__Repor__4F7CD00D" Association="Self.FK__Med_Repor__Repor__4F7CD00D">
+            <End Role="Med_Report_Master" EntitySet="Med_Report_Master" />
+            <End Role="Med_Report_Details" EntitySet="Med_Report_Details" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Med_Repor__Repor__5070F446" Association="Self.FK__Med_Repor__Repor__5070F446">
+            <End Role="Med_Report_Master" EntitySet="Med_Report_Master" />
+            <End Role="Med_Report_Details" EntitySet="Med_Report_Details" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Policy_Ma__Polic__45F365D3" Association="Self.FK__Policy_Ma__Polic__45F365D3">
+            <End Role="Type_Master" EntitySet="Type_Master" />
+            <End Role="Policy_Master" EntitySet="Policy_Master" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="InsuranceBPaaSModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Document_Master">
+          <Key>
+            <PropertyRef Name="DocMasterID" />
+          </Key>
+          <Property Name="DocMasterID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PolicyNo" Type="Int32" Nullable="false" />
+          <Property Name="DocStatusCode" Type="Int32" />
+          <Property Name="Document_Path" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="DocumentName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DocType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DocExtension" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="TransID" Type="Int32" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Policy_Master" Relationship="Self.FK__Document___Polic__412EB0B6" FromRole="Document_Master" ToRole="Policy_Master" />
+        </EntityType>
+        <EntityType Name="KYC_Doc_Master">
+          <Key>
+            <PropertyRef Name="DocID" />
+          </Key>
+          <Property Name="DocID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PolicyNo" Type="Int32" Nullable="false" />
+          <Property Name="DocType" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="IDNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Address" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="DOB" Type="DateTime" Precision="3" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Policy_Master" Relationship="Self.FK__KYC_Doc_M__Polic__4222D4EF" FromRole="KYC_Doc_Master" ToRole="Policy_Master" />
+        </EntityType>
+        <EntityType Name="Med_Report_Details">
+          <Key>
+            <PropertyRef Name="ReportDetailsID" />
+          </Key>
+          <Property Name="ReportDetailsID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ReportID" Type="Int32" Nullable="false" />
+          <Property Name="TestName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="NumericTestValue" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="RangeFrom" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="RangeTill" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="HealthStatus" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="StringTestValue" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Med_Report_Master" Relationship="Self.FK__Med_Repor__Repor__4F7CD00D" FromRole="Med_Report_Details" ToRole="Med_Report_Master" />
+          <NavigationProperty Name="Med_Report_Master1" Relationship="Self.FK__Med_Repor__Repor__5070F446" FromRole="Med_Report_Details" ToRole="Med_Report_Master" />
+        </EntityType>
+        <EntityType Name="Med_Report_Master">
+          <Key>
+            <PropertyRef Name="ReportID" />
+          </Key>
+          <Property Name="ReportID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PolicyNo" Type="Int32" Nullable="false" />
+          <Property Name="ReportType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ReportName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ReportDate" Type="DateTime" Precision="3" />
+          <Property Name="Age" Type="Int32" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Med_Report_Details" Relationship="Self.FK__Med_Repor__Repor__4F7CD00D" FromRole="Med_Report_Master" ToRole="Med_Report_Details" />
+          <NavigationProperty Name="Med_Report_Details1" Relationship="Self.FK__Med_Repor__Repor__5070F446" FromRole="Med_Report_Master" ToRole="Med_Report_Details" />
+        </EntityType>
+        <EntityType Name="Policy_Master">
+          <Key>
+            <PropertyRef Name="PolicyNo" />
+          </Key>
+          <Property Name="PolicyNo" Type="Int32" Nullable="false" />
+          <Property Name="PolicyStatusCode" Type="Int32" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Document_Master" Relationship="Self.FK__Document___Polic__412EB0B6" FromRole="Policy_Master" ToRole="Document_Master" />
+          <NavigationProperty Name="KYC_Doc_Master" Relationship="Self.FK__KYC_Doc_M__Polic__4222D4EF" FromRole="Policy_Master" ToRole="KYC_Doc_Master" />
+          <NavigationProperty Name="Type_Master" Relationship="Self.FK__Policy_Ma__Polic__45F365D3" FromRole="Policy_Master" ToRole="Type_Master" />
+        </EntityType>
+        <EntityType Name="Type_Master">
+          <Key>
+            <PropertyRef Name="TypeId" />
+          </Key>
+          <Property Name="TypeId" Type="Int32" Nullable="false" />
+          <Property Name="TypeName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="TypeCategory" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Policy_Master" Relationship="Self.FK__Policy_Ma__Polic__45F365D3" FromRole="Type_Master" ToRole="Policy_Master" />
+        </EntityType>
+        <Association Name="FK__Document___Polic__412EB0B6">
+          <End Role="Policy_Master" Type="Self.Policy_Master" Multiplicity="1" />
+          <End Role="Document_Master" Type="Self.Document_Master" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Policy_Master">
+              <PropertyRef Name="PolicyNo" />
+            </Principal>
+            <Dependent Role="Document_Master">
+              <PropertyRef Name="PolicyNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__KYC_Doc_M__Polic__4222D4EF">
+          <End Role="Policy_Master" Type="Self.Policy_Master" Multiplicity="1" />
+          <End Role="KYC_Doc_Master" Type="Self.KYC_Doc_Master" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Policy_Master">
+              <PropertyRef Name="PolicyNo" />
+            </Principal>
+            <Dependent Role="KYC_Doc_Master">
+              <PropertyRef Name="PolicyNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Med_Repor__Repor__4F7CD00D">
+          <End Role="Med_Report_Master" Type="Self.Med_Report_Master" Multiplicity="1" />
+          <End Role="Med_Report_Details" Type="Self.Med_Report_Details" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Med_Report_Master">
+              <PropertyRef Name="ReportID" />
+            </Principal>
+            <Dependent Role="Med_Report_Details">
+              <PropertyRef Name="ReportID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Med_Repor__Repor__5070F446">
+          <End Role="Med_Report_Master" Type="Self.Med_Report_Master" Multiplicity="1" />
+          <End Role="Med_Report_Details" Type="Self.Med_Report_Details" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Med_Report_Master">
+              <PropertyRef Name="ReportID" />
+            </Principal>
+            <Dependent Role="Med_Report_Details">
+              <PropertyRef Name="ReportID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Policy_Ma__Polic__45F365D3">
+          <End Role="Type_Master" Type="Self.Type_Master" Multiplicity="0..1" />
+          <End Role="Policy_Master" Type="Self.Policy_Master" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Type_Master">
+              <PropertyRef Name="TypeId" />
+            </Principal>
+            <Dependent Role="Policy_Master">
+              <PropertyRef Name="PolicyStatusCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="InsuranceBPaaSEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Document_Master" EntityType="Self.Document_Master" />
+          <EntitySet Name="KYC_Doc_Master" EntityType="Self.KYC_Doc_Master" />
+          <EntitySet Name="Med_Report_Details" EntityType="Self.Med_Report_Details" />
+          <EntitySet Name="Med_Report_Master" EntityType="Self.Med_Report_Master" />
+          <EntitySet Name="Policy_Master" EntityType="Self.Policy_Master" />
+          <EntitySet Name="Type_Master" EntityType="Self.Type_Master" />
+          <AssociationSet Name="FK__Document___Polic__412EB0B6" Association="Self.FK__Document___Polic__412EB0B6">
+            <End Role="Policy_Master" EntitySet="Policy_Master" />
+            <End Role="Document_Master" EntitySet="Document_Master" />
+          </AssociationSet>
+          <AssociationSet Name="FK__KYC_Doc_M__Polic__4222D4EF" Association="Self.FK__KYC_Doc_M__Polic__4222D4EF">
+            <End Role="Policy_Master" EntitySet="Policy_Master" />
+            <End Role="KYC_Doc_Master" EntitySet="KYC_Doc_Master" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Med_Repor__Repor__4F7CD00D" Association="Self.FK__Med_Repor__Repor__4F7CD00D">
+            <End Role="Med_Report_Master" EntitySet="Med_Report_Master" />
+            <End Role="Med_Report_Details" EntitySet="Med_Report_Details" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Med_Repor__Repor__5070F446" Association="Self.FK__Med_Repor__Repor__5070F446">
+            <End Role="Med_Report_Master" EntitySet="Med_Report_Master" />
+            <End Role="Med_Report_Details" EntitySet="Med_Report_Details" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Policy_Ma__Polic__45F365D3" Association="Self.FK__Policy_Ma__Polic__45F365D3">
+            <End Role="Type_Master" EntitySet="Type_Master" />
+            <End Role="Policy_Master" EntitySet="Policy_Master" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="InsuranceBPaaSModelStoreContainer" CdmEntityContainer="InsuranceBPaaSEntities">
+          <EntitySetMapping Name="Document_Master">
+            <EntityTypeMapping TypeName="InsuranceBPaaSModel.Document_Master">
+              <MappingFragment StoreEntitySet="Document_Master">
+                <ScalarProperty Name="DocMasterID" ColumnName="DocMasterID" />
+                <ScalarProperty Name="PolicyNo" ColumnName="PolicyNo" />
+                <ScalarProperty Name="DocStatusCode" ColumnName="DocStatusCode" />
+                <ScalarProperty Name="Document_Path" ColumnName="Document_Path" />
+                <ScalarProperty Name="DocumentName" ColumnName="DocumentName" />
+                <ScalarProperty Name="DocType" ColumnName="DocType" />
+                <ScalarProperty Name="DocExtension" ColumnName="DocExtension" />
+                <ScalarProperty Name="TransID" ColumnName="TransID" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="KYC_Doc_Master">
+            <EntityTypeMapping TypeName="InsuranceBPaaSModel.KYC_Doc_Master">
+              <MappingFragment StoreEntitySet="KYC_Doc_Master">
+                <ScalarProperty Name="DocID" ColumnName="DocID" />
+                <ScalarProperty Name="PolicyNo" ColumnName="PolicyNo" />
+                <ScalarProperty Name="DocType" ColumnName="DocType" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="IDNumber" ColumnName="IDNumber" />
+                <ScalarProperty Name="Address" ColumnName="Address" />
+                <ScalarProperty Name="DOB" ColumnName="DOB" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Med_Report_Details">
+            <EntityTypeMapping TypeName="InsuranceBPaaSModel.Med_Report_Details">
+              <MappingFragment StoreEntitySet="Med_Report_Details">
+                <ScalarProperty Name="ReportDetailsID" ColumnName="ReportDetailsID" />
+                <ScalarProperty Name="ReportID" ColumnName="ReportID" />
+                <ScalarProperty Name="TestName" ColumnName="TestName" />
+                <ScalarProperty Name="NumericTestValue" ColumnName="NumericTestValue" />
+                <ScalarProperty Name="RangeFrom" ColumnName="RangeFrom" />
+                <ScalarProperty Name="RangeTill" ColumnName="RangeTill" />
+                <ScalarProperty Name="HealthStatus" ColumnName="HealthStatus" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="StringTestValue" ColumnName="StringTestValue" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Med_Report_Master">
+            <EntityTypeMapping TypeName="InsuranceBPaaSModel.Med_Report_Master">
+              <MappingFragment StoreEntitySet="Med_Report_Master">
+                <ScalarProperty Name="ReportID" ColumnName="ReportID" />
+                <ScalarProperty Name="PolicyNo" ColumnName="PolicyNo" />
+                <ScalarProperty Name="ReportType" ColumnName="ReportType" />
+                <ScalarProperty Name="ReportName" ColumnName="ReportName" />
+                <ScalarProperty Name="ReportDate" ColumnName="ReportDate" />
+                <ScalarProperty Name="Age" ColumnName="Age" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Policy_Master">
+            <EntityTypeMapping TypeName="InsuranceBPaaSModel.Policy_Master">
+              <MappingFragment StoreEntitySet="Policy_Master">
+                <ScalarProperty Name="PolicyNo" ColumnName="PolicyNo" />
+                <ScalarProperty Name="PolicyStatusCode" ColumnName="PolicyStatusCode" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Type_Master">
+            <EntityTypeMapping TypeName="InsuranceBPaaSModel.Type_Master">
+              <MappingFragment StoreEntitySet="Type_Master">
+                <ScalarProperty Name="TypeId" ColumnName="TypeId" />
+                <ScalarProperty Name="TypeName" ColumnName="TypeName" />
+                <ScalarProperty Name="TypeCategory" ColumnName="TypeCategory" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
