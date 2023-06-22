@@ -3,33 +3,319 @@ using InsuranceOCR;
 using SautinSoft.Document;
 using System.Configuration;
 using System.Data;
+using OpenCvSharp;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Tesseract;
+using System.Net.Http.Json;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
+using DocumentFormat.OpenXml.Drawing.Charts;
+using DataTable = System.Data.DataTable;
+using System.Diagnostics;
 
 static class Program
 {
+    static string output_Path = ConfigurationManager.AppSettings["output_Path"].ToString();
+    static string pdf_Path = ConfigurationManager.AppSettings["pdf_Path"].ToString();
+    static string log_Path = ConfigurationManager.AppSettings["log_Path"].ToString();
+    static string doc_Path = ConfigurationManager.AppSettings["doc_Path"].ToString();
+    static string webApiUrl = ConfigurationManager.AppSettings["webapi_url"].ToString();
+    static Logger logger = new Logger(log_Path + @"\" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + ".txt");
+
     static void Main(string[] args)
     {
-        var str_text3 = "";
-        string output_Path = ConfigurationManager.AppSettings["output_Path"].ToString();
-        string pdf_Path = ConfigurationManager.AppSettings["pdf_Path"].ToString();
-        string log_Path = ConfigurationManager.AppSettings["log_Path"].ToString();
-        Logger logger = new Logger(log_Path);
+        MyMethodAsync();
+    }
 
+    #region Http
+    private static bool ValidateCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+    {
+        // Accept all certificates regardless of validation errors
+        return true;
+    }
+    private static async Task<HttpResponseMessage> SendHttpRequest(string? requestDataJson, string uri, int method)
+    {
+        try
+        {
+            using (var httpClient = new HttpClient(new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = ValidateCertificate
+            }))
+            {
+                // Set the base URL of the Web API
+                httpClient.BaseAddress = new Uri(webApiUrl);
+
+                // Set the request content type
+                httpClient.DefaultRequestHeaders.Accept.Clear();
+                httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+
+                // Create the request content
+                var content = new StringContent(requestDataJson, Encoding.UTF8, "application/json");
+
+                var response = new HttpResponseMessage();
+                if (method == Convert.ToInt32(Enums.HttpMethod.GET))
+                {
+                    // Send the POST request and get the response
+                    response = await httpClient.GetAsync(uri);
+                }
+                else if(method == Convert.ToInt32(Enums.HttpMethod.POST))
+                {
+                    // Send the POST request and get the response
+                    response = await httpClient.PostAsync(uri, content);
+
+                }
+                return response;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error: " + ex.ToString());
+            logger.Log("Error: " + ex.ToString());
+            return null;
+        }
+    }
+    #endregion
+
+    #region Validation
+    public static bool CheckWords(string words, int Mode)
+    {
+        //Check Range Expression
+        if (Mode == 1)
+        {
+            string pattern = @"\b\d+\.\d+\s*-\s*\d+\.\d+\b";
+            string pattern1 = @"\b\d+\s*-\s*\d+\b";
+            Match match = Regex.Match(words, pattern);
+            if (!match.Success)
+            {
+                match = Regex.Match(words, pattern1);
+            }
+            return match.Success;
+        }
+
+        //Check Numeric
+        else if (Mode == 2)
+        {
+            double n;
+            return double.TryParse(words, out n);
+        }
+        return false;
+    }
+    public static void AutoCorrectResult(ref DataTable DtOCR_Value, List<CommonMedicalVal> common, int typeID)
+    {
+        int rowNum = DtOCR_Value.Rows.Count - 1;
+        if (string.IsNullOrEmpty(Convert.ToString(DtOCR_Value.Rows[rowNum]["Result"])))
+        {
+            DtOCR_Value.Rows[rowNum].Delete();
+            return;
+        }
+        double resOCR = Convert.ToDouble(DtOCR_Value.Rows[rowNum]["Result"]);
+        double fromOCR = Convert.ToDouble(DtOCR_Value.Rows[rowNum]["RangeFrom"]);
+        double toOCR = Convert.ToDouble(DtOCR_Value.Rows[rowNum]["RangeTill"]);
+
+        var c = common.Find(x => x.Id == typeID);
+        double from = c.HighestRangeFrom;
+        double to = c.HighestRangeTill;
+
+        double fromSubtract = fromOCR - from < 0 ? (fromOCR - from) * -1 : fromOCR - from;
+        double toSubtract = to - toOCR < 0 ? (to - toOCR) * -1 : to - toOCR;
+
+        double resFrom = from - resOCR < 0 ? (from - resOCR) * -1 : from - resOCR;
+        double resTo = to - resOCR < 0 ? (to - resOCR) * -1 : to - resOCR;
+
+        double diff = to - from;
+
+        if (fromSubtract > 10)
+        {
+            DtOCR_Value.Rows[rowNum]["RangeFrom"] = from;
+        }
+        else if (fromSubtract > from)
+        {
+            DtOCR_Value.Rows[rowNum]["RangeFrom"] = fromOCR / 10;
+        }
+
+        if (toSubtract > 10)
+        {
+            DtOCR_Value.Rows[rowNum]["RangeTill"] = to;
+        }
+        else if (toSubtract > to)
+        {
+            DtOCR_Value.Rows[rowNum]["RangeTill"] = toOCR / 10;
+        }
+
+        if (resFrom > diff || resTo > diff)
+        {
+            DtOCR_Value.Rows[rowNum]["Result"] = resOCR / 10;
+        }
+    }
+    public static string RemoveSpecialCharacters(this string str)
+    {
+        StringBuilder sb = new StringBuilder();
+        foreach (char c in str)
+        {
+            if (c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z' || c == '.' || c == '_' | c == '-')
+            {
+                sb.Append(c);
+            }
+        }
+        return sb.ToString();
+    }
+    #endregion
+
+    #region Conversion
+    public static int pdfToImage(string pdfPath, string tiffPath)
+    {
+        SautinSoft.PdfFocus f = new SautinSoft.PdfFocus();
+
+        if (!Directory.Exists(tiffPath))
+        {
+            Directory.CreateDirectory(tiffPath);
+        }
+        f.OpenPdf(pdfPath);
+        int pageCnt = f.PageCount;
+        if (pageCnt > 0)
+        {
+            //Save all PDF pages to image folder as tiff images, 200 dpi
+            f.ImageOptions.Dpi = 300;
+            f.ImageOptions.ImageFormat = System.Drawing.Imaging.ImageFormat.Tiff;
+
+            //Returns 3, if there is any exception while converting PDF to image
+            pageCnt = f.ToImage(tiffPath, "Page") == 3 ? 0 : pageCnt;
+        }
+        f.ClosePdf();
+        return pageCnt;
+    }
+    public static int ConvertPDFtoImages(string pdfPath, string tiffPath)
+    {
+        // Path to a document where to extract pictures.
+        // By the way: You may specify DOCX, HTML, RTF files also. 
+        //DocumentCore dc = DocumentCore.Load(@"E:\Workspace\Docs\BloodTests\PDFImagePath\ApolloPlusBloodUrine.pdf");
+        DocumentCore dc = DocumentCore.Load(pdfPath);
+
+        if (!Directory.Exists(tiffPath))
+        {
+            Directory.CreateDirectory(tiffPath);
+        }
+
+        // PaginationOptions allow to know, how many pages we have in the document. 
+        DocumentPaginator dp = dc.GetPaginator(new PaginatorOptions());
+        int pageCnt = dp.Pages.Count;
+        if (pageCnt > 0)
+        {
+            for (int i = 0; i < pageCnt; i++)
+            {
+                //dp.Pages[i].Rasterize(800, SautinSoft.Document.Color.White).Save(@"E:\Workspace\Docs\BloodTests\PDFTextPath\Page" + i + ".tiff");
+                dp.Pages[i].Rasterize(800, Color.White).Save(tiffPath + "Page" + (i + 1) + ".tiff");
+
+            }
+            // Each document page will be saved in its own image format: PNG, JPEG, TIFF with different DPI.
+            //dp.Pages[0].Rasterize(800, SautinSoft.Document.Color.White).Save(@"E:\Workspace\Docs\BloodTests\PDFTextPath\example.png");
+            //dp.Pages[1].Rasterize(400, SautinSoft.Document.Color.White).Save(@"E:\Workspace\Docs\BloodTests\PDFTextPath\example.jpeg");
+            //dp.Pages[2].Rasterize(650, SautinSoft.Document.Color.White).Save(@"E:\Workspace\Docs\BloodTests\PDFTextPath\example.tiff");
+        }
+        return pageCnt;
+    }
+    #endregion
+    
+    public static async Task ManagePolicyFoldersAsync()
+    {
+        string[] dirs = Directory.GetDirectories(doc_Path, "*", SearchOption.TopDirectoryOnly);
+        var requestDataJson = JsonSerializer.Serialize(dirs);
+        await SendHttpRequest(requestDataJson, "PolicyMasterAPI/CheckPolicyMaster", Convert.ToInt32(Enums.HttpMethod.POST));
+    }
+    public static async Task ManageDocsForPolicies()
+    {
+        List<Policy_Docs_Model> policy_Docs_Model = new List<Policy_Docs_Model>();
+        string[] dirs = Directory.GetDirectories(doc_Path, "*", SearchOption.TopDirectoryOnly);
+        foreach (string dir in dirs)
+        {
+            string directoryName = dir.Split(@"\")[dir.Split(@"\").Length - 1];
+            string[] files = Directory.GetFiles(dir, "*", SearchOption.AllDirectories);
+            policy_Docs_Model.Add(new Policy_Docs_Model()
+            {
+                PolicyNo = Convert.ToInt32(directoryName),
+                Files=files
+            });
+        }
+        var requestDataJson = JsonSerializer.Serialize(policy_Docs_Model);
+        await SendHttpRequest(requestDataJson, "PolicyMasterAPI/ManageDocsForPolicies", Convert.ToInt32(Enums.HttpMethod.POST));
+    }
+    public static async Task ProcessPendingDocsAsync()
+    {
+
+        List<Document_Master> ocrData = new List<Document_Master>();
+        var ocrDataResponse = await SendHttpRequest("", "PolicyMasterAPI/GetPendingOCRData", Convert.ToInt32(Enums.HttpMethod.GET));
+        // Check if the response was successful
+        if (ocrDataResponse.IsSuccessStatusCode)
+        {
+            // Read the response content
+            var ocrDataResponseContent = await ocrDataResponse.Content.ReadAsStringAsync();
+            ocrData = JsonSerializer.Deserialize<List<Document_Master>>(ocrDataResponseContent);
+            // Process the response as needed
+            Console.WriteLine("Response: " + ocrDataResponse);
+            logger.Log("Response: " + ocrDataResponse);
+        }
+        else
+        {
+            // Handle the error response
+            Console.WriteLine("Error: " + ocrDataResponse.StatusCode);
+            logger.Log("Error: " + ocrDataResponse.StatusCode);
+        }
+        foreach (var document in ocrData)
+        {
+            if (document.DocExtension==FileExtensions.Jpg|| document.DocExtension == FileExtensions.Png|| document.DocExtension == FileExtensions.Tiff)
+            {
+                ImageProcessing(document);
+            }
+            else if (document.DocExtension == FileExtensions.Pdf)
+            {
+                PDFProcessing(document);
+            }
+        }        
+    }
+
+    public static void ImageProcessing(Document_Master document)
+    {
+
+    }
+
+    public static void PDFProcessing(Document_Master document)
+    {
+
+    }
+
+    public static void OCRProcessing(string imagePath)
+    {
+        var str_text3 = "";
         //Read Medical Parameters from JSON file
         string text = File.ReadAllText(@"./CommonMedValues.json");
         var common = JsonSerializer.Deserialize<List<CommonMedicalVal>>(text);
 
         #region PDF To Tiff
         //SautinSoft
-        string imagePath = pdf_Path + @"BloodReportImages\";
-        //int pageCnt = pdfToImage(pdf_Path + "VighnaharBloodUrineTest.pdf", imagePath);
-        Console.WriteLine("Converting PDF to images");
+        //string imagePath = pdf_Path + @"BloodReportImages\"; //BloodTest
+        string imagePath = doc_Path + @"ECGTests\ECGTestImages\"; //ECG
+        //int pageCnt = pdfToImage(pdf_Path + "ApolloPlusBloodUrine.pdf", imagePath);
+        Console.WriteLine($"{DateTime.Now}: Converting PDF to images");
         logger.Log("Converting PDF to images");
-        int pageCnt = ConvertPDFtoImages(pdf_Path + "ApolloPlusBloodUrine.pdf", imagePath);
-        Console.WriteLine("Images Generated");
+
+        //var medReports = JsonSerializer.Deserialize<string>(File.ReadAllText(@"./MedicalReports.json"));
+
+
+        //BloodTest
+        //int pageCnt = ConvertPDFtoImages(pdf_Path + "VighnaharBloodUrineTest.pdf", imagePath);
+        //int pageCnt = ConvertPDFtoImages(pdf_Path + "ApolloPlusBloodUrine.pdf", imagePath);
+        //int pageCnt = ConvertPDFtoImages(pdf_Path + "ArthDiagnostics.pdf", imagePath);
+        //int pageCnt = ConvertPDFtoImages(pdf_Path + "CrystalBloodUrineTest.pdf", imagePath);
+        //int pageCnt = ConvertPDFtoImages(pdf_Path + "KarthikaBloodUrinetest.pdf", imagePath);
+
+        //ECG
+        //int pageCnt = ConvertPDFtoImages(@"G:\Workspace\Docs\ECGTests\ArthDiagnostics.pdf", imagePath);
+        //int pageCnt = ConvertPDFtoImages(@"G:\Workspace\Docs\ECGTests\GoldRushPathology.pdf", imagePath);
+        int pageCnt = ConvertPDFtoImages(@"G:\Workspace\Docs\ECGTests\KarthikaHealthCare.pdf", imagePath);
+
+        Console.WriteLine($"{DateTime.Now}: Images Generated");
         logger.Log("Images Generated");
         #endregion
 
@@ -53,16 +339,30 @@ static class Program
         });
         try
         {
-            Console.WriteLine("Running OCR on PDF");
+            Console.WriteLine($"{DateTime.Now}: Running OCR on PDF");
             logger.Log("Running OCR on PDF");
             for (int i = 1; i <= pageCnt; i++)
             {
+                //ECG
+                string imageFilePath = doc_Path + @"ECGTests\ECGTestImages\Page" + i + ".tiff";
+                Mat image = new Mat();
+                image = Cv2.ImRead(imageFilePath);
+                Mat Output = new Mat();
+                Cv2.Threshold(image, Output, 153, 255, ThresholdTypes.Binary);
+
+                Output.SaveImage(@"G:\Workspace\Docs\ECGTests\ECGTestImages\ProcessedImage.jpeg");
+
+
                 using (var tEngine = new TesseractEngine(tessdataPath, "eng", EngineMode.Default)) //creating the tesseract OCR engine with English as the language
                 {
                     tEngine.SetVariable("debug_file", "null");
-                    using (var img = Pix.LoadFromFile(pdf_Path + @"BloodReportImages\Page" + i + ".tiff")) // Load of the image file from the Pix object which is a wrapper for Leptonica PIX structure
+
+                    //Load of the image file from the Pix object which is a wrapper for Leptonica PIX structure
+                    //using (var img = Pix.LoadFromFile(pdf_Path + @"BloodReportImages\Page" + i + ".tiff")) // Blood Test
+                    using (var img = Pix.LoadFromFile(pdf_Path + @"ECGTestImages\ProcessedImage.jpeg")) // ECG
                     {
-                        var pixFile = img.Deskew();
+                        var pixFile = img.Rotate((float)(90 * Math.PI / 180.0f)); //ECG
+                        //pixFile = pixFile.Deskew();
                         //pixFile.Save(pdf_Path + @"BloodReportImages\Page" + i + ".tiff");
                         using (var page = tEngine.Process(img)) //process the specified image
                         {
@@ -86,7 +386,7 @@ static class Program
                     }
                 }
             }
-            Console.WriteLine("OCR completed!");
+            Console.WriteLine($"{DateTime.Now}: OCR completed!");
             logger.Log("OCR completed!");
 
 
@@ -111,13 +411,14 @@ static class Program
                     }
 
 
-                    if (dt.Rows[i]["text"].ToString().ToUpper().Contains("URINE")
-                    && dt.Rows[i + 1]["text"].ToString().ToUpper().Contains("EXAMINATION"))
+                    if ((value.ToUpper().Contains("URINE") && dt.Rows[i + 1]["text"].ToString().ToUpper().Contains("EXAMINATION"))
+                        || value.ToUpper().Contains("URINE") && dt.Rows[i + 1]["text"].ToString().ToUpper().Contains("ROUTINE") && dt.Rows[i + 2]["text"].ToString().ToUpper().Contains("EXAMINATION"))
                     {
                         DataRow drHeader = DtOCR_Value.NewRow();
                         drHeader["Test"] = "URINE EXAMINATION";
                         DtOCR_Value.Rows.Add(drHeader);
-                        var menu = common.FindAll(x => x.HasSubMenu == true);
+                        var urineMenu = common.FindAll(x => x.IsSubMenu == true);
+                        var menu = common.FindAll(x => x.IsSubMenu == false);
 
                         DataRow dr = DtOCR_Value.NewRow();
                         DtOCR_Value.Rows.Add(dr);
@@ -128,9 +429,16 @@ static class Program
                         {
                             i = counter;
                             string v = Convert.ToString(dt.Rows[counter]["text"]);
-                            Console.WriteLine("Keyword: " + v);
+
+                            bool nonurine = menu.Exists(x => x.TestName == v.ToUpper());
+                            if (nonurine)
+                                break;
+
+
+
+                            Console.WriteLine($"{DateTime.Now}: Urine Test Keyword: " + v);
                             logger.Log("Keyword: " + v);
-                            if (v == "")
+                            if (string.IsNullOrEmpty(v))
                             {
                                 continue;
                             }
@@ -145,7 +453,7 @@ static class Program
                                 }
                             }
 
-                            foreach (var item in menu)
+                            foreach (var item in urineMenu)
                             {
                                 if (DtOCR_Value.Rows[rowNumber]["Test"].ToString() == "")
                                     altMatch = v.ToUpper().Contains(item.Alternatives);
@@ -202,28 +510,12 @@ static class Program
                                 }
                                 if (!altMatch)
                                     continue;
-                                //string[] valRef = item.ValueReferences.Split('|');
-                                //int index = Array.FindIndex(valRef, x => (v.ToUpper()).Contains(x));
 
                                 i = counter;
                                 break;
                             }
                         }
                     }
-
-                    //string alt = "";
-
-                    //foreach (var item in common)
-                    //{
-                    //    alt = alt != "" ? alt + "|" + item.Alternatives : item.Alternatives;
-                    //}
-                    //string[] arr = alt.Split('|');
-                    //bool a = Array.Exists(arr, x => (value.ToUpper()).Contains(x));
-
-                    //if (!a)
-                    //{
-                    //    continue;
-                    //}
 
                     foreach (var item in common)
                     {
@@ -276,9 +568,23 @@ static class Program
                         DtOCR_Value.Rows.Add(row);
                         int rowNum = DtOCR_Value.Rows.Count - 1;
 
+                        if (item.IsMultiWord)
+                        {
+                            string resultantString = string.Join("", words_MedValues);
+                            Console.WriteLine($"{DateTime.Now}: Multi-Keyword: " + resultantString);
+                            logger.Log($"{DateTime.Now}: Multi-Keyword: " + resultantString);
+                            string[] alt = item.MultiWordAlternatives.Split('|');
+                            if (!Array.Exists(alt, x => resultantString.ToUpper().Contains(x.ToUpper())))
+                            {
+                                if (string.IsNullOrEmpty(Convert.ToString(DtOCR_Value.Rows[rowNum]["Result"])))
+                                    DtOCR_Value.Rows[rowNum].Delete();
+                                continue;
+                            }
+                        }
+
                         for (int j = 0; j < words_MedValues.Count; j++)
                         {
-                            Console.WriteLine("Keyword: " + words_MedValues[j]);
+                            Console.WriteLine($"{DateTime.Now}: Keyword: " + words_MedValues[j]);
                             logger.Log("Keyword: " + words_MedValues[j]);
                             //Check whether word captured is numeric
                             string val = RemoveSpecialCharacters(words_MedValues[j]);
@@ -294,11 +600,11 @@ static class Program
                                 {
                                     if (DtOCR_Value.Rows[rowNum]["Result"].ToString() != "")
                                     {
-                                        if (words_MedValues[j + 1] == "-" || words_MedValues[j + 1] == "to")
+                                        if (words_MedValues[j + 1] == "-" || words_MedValues[j + 1] == "to" || words_MedValues[j + 1] == "--")
                                         {
                                             string rangeTill = words_MedValues[j + 2];
-                                            DtOCR_Value.Rows[rowNum]["RangeFrom"] = words_MedValues[j];
-                                            DtOCR_Value.Rows[rowNum]["RangeTill"] = CheckWords(rangeTill, 2) ? rangeTill : "";
+                                            DtOCR_Value.Rows[rowNum]["RangeFrom"] = val;
+                                            DtOCR_Value.Rows[rowNum]["RangeTill"] = CheckWords(rangeTill, 2) ? rangeTill : item.HighestRangeTill;
                                             j = j + 2;
                                             break;
                                         }
@@ -338,7 +644,11 @@ static class Program
                         }
                         if (item.StringResult == "" || item.StringResult == null)
                         {
+                            Console.WriteLine($"{DateTime.Now}: {DtOCR_Value.Rows[rowNum][0]} Before AutoCorrect: {DtOCR_Value.Rows[rowNum][1]} {DtOCR_Value.Rows[rowNum][2]} {DtOCR_Value.Rows[rowNum][3]}");
+                            logger.Log($"{DateTime.Now}: {DtOCR_Value.Rows[rowNum][0]} Before AutoCorrect: {DtOCR_Value.Rows[rowNum][1]} {DtOCR_Value.Rows[rowNum][2]} {DtOCR_Value.Rows[rowNum][3]}");
                             AutoCorrectResult(ref DtOCR_Value, common, item.Id);
+                            logger.Log($"{DateTime.Now}: {DtOCR_Value.Rows[rowNum][0]} Before AutoCorrect: {DtOCR_Value.Rows[rowNum][1]} {DtOCR_Value.Rows[rowNum][2]} {DtOCR_Value.Rows[rowNum][3]}");
+                            Console.WriteLine($"{DateTime.Now}: {DtOCR_Value.Rows[rowNum][0]} After AutoCorrect: {DtOCR_Value.Rows[rowNum][1]} {DtOCR_Value.Rows[rowNum][2]} {DtOCR_Value.Rows[rowNum][3]}");
                             if (Convert.ToDouble(DtOCR_Value.Rows[rowNum]["Result"]) > Convert.ToDouble(DtOCR_Value.Rows[rowNum]["RangeFrom"])
                                         && Convert.ToDouble(DtOCR_Value.Rows[rowNum]["Result"]) < Convert.ToDouble(DtOCR_Value.Rows[rowNum]["RangeTill"]))
                             {
@@ -375,6 +685,23 @@ static class Program
             DtOCR_Value.TableName = "OCR_Value";
             ds.Tables.Add(DtOCR_Value);
 
+            List<Policy_Master> policies = new List<Policy_Master>();
+            int ProposalNumber = 0;
+
+            foreach (DataRow dr in DtOCR_Value.Rows)
+            {
+                policies.Add(new Policy_Master()
+                {
+                    PolicyNo = ProposalNumber,
+                    PolicyStatusCode = 0,
+                    CreatedDate = DateTime.Now,
+                    CreatedBy = "SYSTEM"
+                });
+            }
+
+            var requestDataJson = JsonSerializer.Serialize(policies);
+            //await SendHttpRequest(requestDataJson, "PolicyMasterAPI/AddMedicalValues");
+
             using (XLWorkbook wb = new XLWorkbook())
             {
                 wb.Worksheets.Add(ds);
@@ -401,136 +728,47 @@ static class Program
         }
         catch (Exception e)
         {
-            Console.WriteLine("Unexpected Error: " + e.Message);
+            Console.WriteLine($"{DateTime.Now}: Unexpected Error: " + e.Message);
             logger.Log($"Error occurred: {e.Message}");
 
         }
 
-
-
     }
-
-    public static bool CheckWords(string words, int Mode)
+    public static async Task MyMethodAsync()
     {
-        //Check Range Expression
-        if (Mode == 1)
+        Task<int> longRunningTask = LongRunningOperationAsync();
+
+        // run the below code in separate thread
+        //some code here 
+        //some code here
+        for (int i = 0; i < 10000000000; i++)
         {
-            string pattern = @"\b\d+\.\d+\s*-\s*\d+\.\d+\b";
-            string pattern1 = @"\b\d+\s*-\s*\d+\b";
-            Match match = Regex.Match(words, pattern);
-            if (!match.Success)
+            Console.WriteLine(i); //SET BREAK POINT HERE
+        }
+        //some code here
+
+        //and now we call await on the task 
+        int result = await longRunningTask;
+    }
+    public static async Task<int> LongRunningOperationAsync() // assume we return an int from this long running operation 
+    {
+        int timerDelayInSecs = Convert.ToInt32(ConfigurationManager.AppSettings["timerDelayInSecs"]);
+        bool retry = true;
+
+        using (AutoResetEvent wait = new AutoResetEvent(false))
+        {
+            while (retry)
             {
-                match = Regex.Match(words, pattern1);
-            }
-            return match.Success;
-        }
 
-        //Check Numeric
-        else if (Mode == 2)
-        {
-            double n;
-            return double.TryParse(words, out n);
-        }
-        return false;
-    }
-    public static void AutoCorrectResult(ref DataTable DtOCR_Value, List<CommonMedicalVal> common, int typeID)
-    {
-        int rowNum = DtOCR_Value.Rows.Count - 1;
-        double resOCR = Convert.ToDouble(DtOCR_Value.Rows[rowNum]["Result"]);
-        double fromOCR = Convert.ToDouble(DtOCR_Value.Rows[rowNum]["RangeFrom"]);
-        double toOCR = Convert.ToDouble(DtOCR_Value.Rows[rowNum]["RangeTill"]);
-
-        var c = common.Find(x => x.Id == typeID);
-        double from = c.HighestRangeFrom;
-        double to = c.HighestRangeTill;
-
-        double fromSubtract = fromOCR - from < 0 ? (fromOCR - from) * -1 : fromOCR - from;
-        double toSubtract = to - toOCR < 0 ? (to - toOCR) * -1 : to - toOCR;
-
-        double resFrom = from - resOCR < 0 ? (from - resOCR) * -1 : from - resOCR;
-        double resTo = to - resOCR < 0 ? (to - resOCR) * -1 : to - resOCR;
-
-        double diff = to - from;
-
-        if (fromSubtract > from)
-        {
-            DtOCR_Value.Rows[rowNum]["RangeFrom"] = fromOCR / 10;
-        }
-        if (toSubtract > to)
-        {
-            DtOCR_Value.Rows[rowNum]["RangeTill"] = toOCR / 10;
-        }
-
-        if (resFrom > diff || resTo > diff)
-        {
-            DtOCR_Value.Rows[rowNum]["Result"] = resOCR / 10;
-        }
-    }
-    public static string RemoveSpecialCharacters(this string str)
-    {
-        StringBuilder sb = new StringBuilder();
-        foreach (char c in str)
-        {
-            if (c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z' || c == '.' || c == '_' | c == '-')
-            {
-                sb.Append(c);
+                //Do Work here
+                //_ = ManagePolicyFoldersAsync();
+                //_ = ManageDocsForPolicies();
+                OCRProcessing();
+                //await Task.Delay(43200000); //12 hour delay
+                await Task.Delay(timerDelayInSecs * 1000); //SET BREAK POINT HERE
             }
         }
-        return sb.ToString();
+
+        return 1;
     }
-
-    public static int pdfToImage(string pdfPath, string tiffPath)
-    {
-        SautinSoft.PdfFocus f = new SautinSoft.PdfFocus();
-
-        if (!Directory.Exists(tiffPath))
-        {
-            Directory.CreateDirectory(tiffPath);
-        }
-        f.OpenPdf(pdfPath);
-        int pageCnt = f.PageCount;
-        if (pageCnt > 0)
-        {
-            //Save all PDF pages to image folder as tiff images, 200 dpi
-            f.ImageOptions.Dpi = 300;
-            f.ImageOptions.ImageFormat = System.Drawing.Imaging.ImageFormat.Tiff;
-
-            //Returns 3, if there is any exception while converting PDF to image
-            pageCnt = f.ToImage(tiffPath, "Page") == 3 ? 0 : pageCnt;
-        }
-        f.ClosePdf();
-        return pageCnt;
-    }
-
-    public static int ConvertPDFtoImages(string pdfPath, string tiffPath)
-    {
-        // Path to a document where to extract pictures.
-        // By the way: You may specify DOCX, HTML, RTF files also. 
-        //DocumentCore dc = DocumentCore.Load(@"E:\Workspace\Docs\BloodTests\PDFImagePath\ApolloPlusBloodUrine.pdf");
-        DocumentCore dc = DocumentCore.Load(pdfPath);
-
-        if (!Directory.Exists(tiffPath))
-        {
-            Directory.CreateDirectory(tiffPath);
-        }
-
-        // PaginationOptions allow to know, how many pages we have in the document. 
-        DocumentPaginator dp = dc.GetPaginator(new PaginatorOptions());
-        int pageCnt = dp.Pages.Count;
-        if (pageCnt > 0)
-        {
-            for (int i = 0; i < pageCnt; i++)
-            {
-                //dp.Pages[i].Rasterize(800, SautinSoft.Document.Color.White).Save(@"E:\Workspace\Docs\BloodTests\PDFTextPath\Page" + i + ".tiff");
-                dp.Pages[i].Rasterize(800, Color.White).Save(tiffPath + "Page" + (i + 1) + ".tiff");
-
-            }
-            // Each document page will be saved in its own image format: PNG, JPEG, TIFF with different DPI.
-            //dp.Pages[0].Rasterize(800, SautinSoft.Document.Color.White).Save(@"E:\Workspace\Docs\BloodTests\PDFTextPath\example.png");
-            //dp.Pages[1].Rasterize(400, SautinSoft.Document.Color.White).Save(@"E:\Workspace\Docs\BloodTests\PDFTextPath\example.jpeg");
-            //dp.Pages[2].Rasterize(650, SautinSoft.Document.Color.White).Save(@"E:\Workspace\Docs\BloodTests\PDFTextPath\example.tiff");
-        }
-        return pageCnt;
-    }
-
 }
