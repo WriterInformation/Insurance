@@ -6,6 +6,6 @@ namespace InsuranceBPaaS_WebAPI.Models
     {
         [Key]
         public int TypeId { get; set; }
-        public string TypeName { get; set; }
+        public string? TypeName { get; set; }
     }
 }

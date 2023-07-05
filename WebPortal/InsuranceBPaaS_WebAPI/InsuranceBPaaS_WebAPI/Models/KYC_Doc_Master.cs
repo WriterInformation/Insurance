@@ -11,15 +11,15 @@ namespace InsuranceBPaaS_WebAPI.Models
         public virtual int PolicyNo { get; set; }
 
         [ForeignKey("PolicyNo")]
-        public virtual Policy_Master policyMaster { get; set; }
-        public string DocType { get; set; }
-        public string Name { get; set; }
-        public string IDNumber { get; set; }
-        public string Address { get; set; }
+        public virtual Policy_Master? policyMaster { get; set; }
+        public string? DocType { get; set; }
+        public string? Name { get; set; }
+        public string? IDNumber { get; set; }
+        public string? Address { get; set; }
         public DateTime DOB { get; set; }
         public DateTime CreatedDate { get; set; }
-        public string CreatedBy { get; set; }
+        public string? CreatedBy { get; set; }
         public DateTime ModifiedDate { get; set; }
-        public string ModifiedBy { get; set; }
+        public string? ModifiedBy { get; set; }
     }
 }

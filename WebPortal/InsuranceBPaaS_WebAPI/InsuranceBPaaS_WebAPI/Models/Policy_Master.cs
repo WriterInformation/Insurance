@@ -15,8 +15,8 @@ namespace InsuranceBPaaS_WebAPI.Models
         [ForeignKey("PolicyStatusCode")]
         public virtual Type_Master? Type_Master { get; set; }
         public DateTime CreatedDate { get; set; }
-        public string CreatedBy { get; set; }
-        public DateTime? ModifiedDate { get; set; }
+        public string? CreatedBy { get; set; }
+        public Nullable<DateTime> ModifiedDate { get; set; }
         public string? ModifiedBy { get; set; }
     }
 }

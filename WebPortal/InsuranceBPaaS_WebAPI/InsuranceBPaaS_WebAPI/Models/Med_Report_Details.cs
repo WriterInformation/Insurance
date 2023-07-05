@@ -13,15 +13,16 @@ namespace InsuranceBPaaS_WebAPI.Models
         public virtual int ReportID { get; set; }
 
         [ForeignKey("ReportID")]
-        public virtual Med_Report_Master medReportMaster { get; set; }
-        public int TestName { get; set; }
-        public double TestValue { get; set; }
-        public double RangeFrom { get; set; }
-        public double RangeTill { get; set; }
-        public string HealthStatus { get; set; }
+        public virtual Med_Report_Master? medReportMaster { get; set; }
+        public string? TestName { get; set; }
+        public Nullable<decimal> NumericTestValue { get; set; }
+        public Nullable<decimal> RangeFrom { get; set; }
+        public Nullable<decimal> RangeTill { get; set; }
+        public string? HealthStatus { get; set; }
         public DateTime CreatedDate { get; set; }
-        public string CreatedBy { get; set; }
-        public DateTime ModifiedDate { get; set; }
-        public string ModifiedBy { get; set; }
+        public string? CreatedBy { get; set; }
+        public Nullable<DateTime> ModifiedDate { get; set; }
+        public string? ModifiedBy { get; set; }
+        public string? StringTestValue { get; set; }
     }
 }
