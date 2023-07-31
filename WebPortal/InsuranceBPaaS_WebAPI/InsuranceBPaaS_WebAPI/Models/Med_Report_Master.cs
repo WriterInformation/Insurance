@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace InsuranceBPaaS_WebAPI.Models
+namespace InsuranceBPaaSWebAPI.Models
 {
     public class Med_Report_Master
     {

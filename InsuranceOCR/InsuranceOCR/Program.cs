@@ -1,32 +1,68 @@
-﻿using ClosedXML.Excel;
-using InsuranceOCR;
+﻿using InsuranceOCR;
 using SautinSoft.Document;
 using System.Configuration;
 using System.Data;
-using OpenCvSharp;
 using System.Text;
-using System.Text.Json;
 using System.Text.RegularExpressions;
 using Tesseract;
-using System.Net.Http.Json;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
-using DocumentFormat.OpenXml.Drawing.Charts;
 using DataTable = System.Data.DataTable;
-using System.Diagnostics;
+using Color = SautinSoft.Document.Color;
+using Path = System.IO.Path;
+using OpenCvSharp;
+using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json;
+using DocumentFormat.OpenXml.EMMA;
+using System.Globalization;
 
 static class Program
 {
-    static string output_Path = ConfigurationManager.AppSettings["output_Path"].ToString();
     static string pdf_Path = ConfigurationManager.AppSettings["pdf_Path"].ToString();
     static string log_Path = ConfigurationManager.AppSettings["log_Path"].ToString();
+    //static string project_Path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName;
     static string doc_Path = ConfigurationManager.AppSettings["doc_Path"].ToString();
     static string webApiUrl = ConfigurationManager.AppSettings["webapi_url"].ToString();
+    static string tessdataPath = ConfigurationManager.AppSettings["tessdataPath"].ToString();
+    static int timerDelayInMins = Convert.ToInt32(ConfigurationManager.AppSettings["timerDelayInMins"]);
+    static string SFTPServerPath = ConfigurationManager.AppSettings["sFTPServerPath"].ToString();
     static Logger logger = new Logger(log_Path + @"\" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + ".txt");
 
     static void Main(string[] args)
     {
-        MyMethodAsync();
+        //MyMethodAsync();
+        ////ProcessPendingDocsAsync();
+
+        // Interval between task repetitions in milliseconds
+        int interval = timerDelayInMins * 60000;
+
+        // Create a cancellation token source to stop the tasks
+        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        CancellationToken cancellationToken = cancellationTokenSource.Token;
+
+        // Start the tasks in parallel with timer interval
+        //Task.Run(() => DirectoryCopying(interval, cancellationToken));          //Copying the files
+        //Task.Run(() => ManagePolicyFoldersAsync(interval, cancellationToken));  //Check and add new Policy Folders
+        //Task.Run(() => ManageDocsForPolicies(interval, cancellationToken));     //Check and add new Documents in the policy folders
+        //Task.Run(() => ProcessPendingDocsAsync(interval, cancellationToken));   //OCR Processing
+
+        //Start the tasks in parallel one time
+        Task.Run(() => DirectoryCopying());          //Copying the files
+        Task.Run(() => ManagePolicyFoldersAsync());  //Check and add new Policy Folders
+        Task.Run(() => ManageDocsForPolicies());     //Check and add new Documents in the policy folders
+        //Task.Run(() => ProcessPendingDocsAsync());   //OCR Processing
+        //Task.Run(() => Task3(interval, cancellationToken));
+
+        // Wait for user input to stop the tasks
+        Console.WriteLine("Press Enter to stop the tasks.");
+        Console.ReadLine();
+
+        // Cancel the tasks
+        cancellationTokenSource.Cancel();
+
+        Console.WriteLine("Tasks stopped. Press any key to exit.");
+        Console.ReadKey();
+
     }
 
     #region Http
@@ -60,7 +96,7 @@ static class Program
                     // Send the POST request and get the response
                     response = await httpClient.GetAsync(uri);
                 }
-                else if(method == Convert.ToInt32(Enums.HttpMethod.POST))
+                else if (method == Convert.ToInt32(Enums.HttpMethod.POST))
                 {
                     // Send the POST request and get the response
                     response = await httpClient.PostAsync(uri, content);
@@ -100,6 +136,20 @@ static class Program
             double n;
             return double.TryParse(words, out n);
         }
+        //Check Date dd/mm/yyyy or dd-mm-yyyy
+        else if (Mode == 3)
+        {
+            Regex regex = new Regex(@"(((0|1)[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/((19|20)\d\d))$");
+            bool isValid = regex.IsMatch(words.Trim());
+            if (!isValid)
+            {
+                regex = new Regex(@"(((0|1)[0-9]|2[0-9]|3[0-1])\-(0[1-9]|1[0-2])\-((19|20)\d\d))$");
+                isValid = regex.IsMatch(words.Trim());
+            }
+
+            return isValid;
+        }
+
         return false;
     }
     public static void AutoCorrectResult(ref DataTable DtOCR_Value, List<CommonMedicalVal> common, int typeID)
@@ -161,6 +211,78 @@ static class Program
         }
         return sb.ToString();
     }
+    static string ContainsMonth(string input)
+    {
+        string[] months = {
+            "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE",
+            "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER",
+            "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+            "JUL", "AUG", "SEPT", "OCT", "NOV", "DEC"
+        };
+
+        string pattern = @"\b(" + string.Join("|", months) + @")\b";
+        Regex regex = new Regex(pattern, RegexOptions.IgnoreCase);
+        Match match = regex.Match(input);
+
+        if (match.Success)
+        {
+            return match.Value;
+        }
+
+        return null; // No month found
+    }
+    static string ContainsYear(string input)
+    {
+        // Method 1: String Manipulation
+        string year1 = input.Substring(input.IndexOf('-') + 1);
+        if (year1 != "")
+        {
+            return year1;
+        }
+
+        // Method 2: Regular Expression
+        string pattern = @"\b\d{4}\b";
+        Match match = Regex.Match(input, pattern);
+        if (match.Success)
+        {
+            string year2 = match.Value;
+            return year2;  // Output: 2022
+        }
+        return null;
+    }
+    static int ConvertMonthToInt(string monthName)
+    {
+        string monthAbbreviationUpper = monthName.ToUpper();
+        if (Mappings.monthMappings.ContainsKey(monthAbbreviationUpper))
+        {
+            return Mappings.monthMappings[monthAbbreviationUpper];
+        }
+        DateTime dateTime = DateTime.ParseExact(monthName, "MMMM", null);
+        return dateTime.Month;
+    }
+
+    static void RemoveBlankData(ref DataTable dtOCR)
+    {
+        // Assuming you have a DataTable named "dataTable"
+
+        // Iterate through each row of the DataTable in reverse order
+        for (int i = dtOCR.Rows.Count - 1; i >= 0; i--)
+        {
+            DataRow row = dtOCR.Rows[i];
+
+            // Iterate through each column of the DataTable
+            foreach (DataColumn column in dtOCR.Columns)
+            {
+                // Check if the value is empty or blank
+                if (string.IsNullOrWhiteSpace(row[column.ColumnName].ToString()))
+                {
+                    // Remove the row from the DataTable
+                    dtOCR.Rows.RemoveAt(i);
+                    break; // Break the inner loop and move to the next row
+                }
+            }
+        }
+    }
     #endregion
 
     #region Conversion
@@ -190,7 +312,6 @@ static class Program
     {
         // Path to a document where to extract pictures.
         // By the way: You may specify DOCX, HTML, RTF files also. 
-        //DocumentCore dc = DocumentCore.Load(@"E:\Workspace\Docs\BloodTests\PDFImagePath\ApolloPlusBloodUrine.pdf");
         DocumentCore dc = DocumentCore.Load(pdfPath);
 
         if (!Directory.Exists(tiffPath))
@@ -217,113 +338,339 @@ static class Program
         return pageCnt;
     }
     #endregion
-    
+
+    static async Task KYCOCRProcessingAsync(DataTable dt, Proposal_Master proposalData, Document_Master document)
+    {
+        try
+        {
+            bool IsNameMatch = false;
+            bool IsDOBMatch = false;
+            bool IsCityMatch = false;
+            bool IsPinCodeMatch = false;
+
+            string strAddr = string.Empty;
+            string strName = string.Empty;
+            string strAadharNo = string.Empty;
+            string strPAN = string.Empty;
+            DataTable DtOCR_Value = new DataTable();
+            DtOCR_Value.Columns.AddRange(new DataColumn[3]
+            {
+                  new DataColumn("FieldName",typeof(string)),
+                  new DataColumn("FieldValue",typeof(string)),
+                  new DataColumn("MatchStatus",typeof(string))
+            });
+
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                string value = Convert.ToString(dt.Rows[i]["text"]);
+                if (RemoveSpecialCharacters(value) == "")
+                {
+                    continue;
+                }
+
+                bool isDateExpression = CheckWords(value.Trim(), 3);
+
+                if (isDateExpression)
+                {
+                    if (!string.IsNullOrEmpty(proposalData.DOB))
+                    {
+                        bool matchDOB = value.ToUpper().Contains(proposalData.DOB.ToUpper());
+                        if (!matchDOB)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            IsDOBMatch = true;
+                        }
+                    }
+
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(proposalData.FirstName))
+                    {
+                        bool matchName = value.ToUpper().Contains(proposalData.FirstName.ToUpper());
+                        if (!matchName)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            //if (item.valueCaptured == true)
+                            //{
+                            //    continue;
+                            //}
+
+
+                            int left = Convert.ToInt32(dt.Rows[i]["left"]);
+                            int top = Convert.ToInt32(dt.Rows[i]["top"]);
+                            int width = Convert.ToInt32(dt.Rows[i]["width"]);
+                            int height = Convert.ToInt32(dt.Rows[i]["height"]);
+                            int line_num = Convert.ToInt32(dt.Rows[i]["lin_num"]);
+                            int block_num = Convert.ToInt32(dt.Rows[i]["block_num"]);
+                            int para_num = Convert.ToInt32(dt.Rows[i]["para_num"]);
+
+                            DataTable dt_MedReportValues = new DataTable();
+                            DataView dv = new DataView(dt);
+                            dv.RowFilter = "block_num = " + block_num + " AND para_num = " + para_num + " AND lin_num = " + line_num;
+                            dt_MedReportValues = dv.ToTable();
+
+                            List<string> words_MedValues = new List<string>();
+
+                            foreach (DataRow dr_test in dt_MedReportValues.Rows)
+                            {
+                                if (dr_test["text"].ToString() != "" && dr_test["text"].ToString() != " ")
+                                {
+                                    //words_MedValues.Add(dr_test["text"].ToString());
+                                    if (!strName.Contains(dr_test["text"].ToString()))
+                                    {
+                                        strName = strName + dr_test["text"].ToString() + " ";
+                                    }
+                                }
+                            }
+
+                            List<string> nameParameters = new List<string>();
+                            nameParameters.Add(proposalData.FirstName);
+                            if (proposalData.MiddleName != "--")
+                            {
+                                nameParameters.Add(proposalData.MiddleName);
+                            }
+                            nameParameters.Add(proposalData.LastName);
+                            int cnt = nameParameters.Select(x => strName.ToUpper().Contains(x.ToUpper())).Count();
+                            IsNameMatch = (cnt == nameParameters.Count);
+                        }
+                    }
+
+
+
+                    if (!string.IsNullOrEmpty(proposalData.CurrentCity))
+                    {
+                        bool matchCity = value.ToUpper().Contains(proposalData.CurrentCity.ToUpper());
+                        if (!matchCity)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            IsCityMatch = true;
+                        }
+                    }
+
+
+                    bool matchPinCode = value.Contains(proposalData.CurrentPinCode.ToString());
+                    if (!matchPinCode)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        IsPinCodeMatch = true;
+                    }
+
+                }
+            }
+
+
+
+            KYC_Verify_Master kyc_Verify_Master = new KYC_Verify_Master()
+            {
+                Name = Convert.ToInt32(IsNameMatch),
+                DOB = Convert.ToInt32(IsDOBMatch),
+                City = Convert.ToInt32(IsCityMatch),
+                Pincode = Convert.ToInt32(IsPinCodeMatch),
+                PolicyNo = document.policyNo,
+                DocMasterID = document.docMasterID,
+                CreatedDate = DateTime.Now,
+                CreatedBy = "SYSTEM"
+            };
+
+            var requestDataJson = System.Text.Json.JsonSerializer.Serialize(kyc_Verify_Master);
+            var med_Report_Master_Response = await SendHttpRequest(requestDataJson, "PolicyMasterAPI/AddkycOCRResult", Convert.ToInt32(Enums.HttpMethod.POST));
+
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+    static void KYC_OCRPreProcessing(string imageFilePath)
+    {
+        try
+        {
+            //imageFilePath = @"G:\Workspace\Docs\Proof Of Address.jpg";
+            Mat image = new Mat();
+            image = Cv2.ImRead(imageFilePath);
+
+            Mat GrayImage = new Mat();
+            Cv2.CvtColor(image, GrayImage, ColorConversionCodes.BGR2GRAY);
+
+            Mat BlurImage = new Mat();
+            Cv2.GaussianBlur(GrayImage, BlurImage, new OpenCvSharp.Size(1, 1), 0);
+
+            Mat Output = new Mat();
+            Cv2.Threshold(BlurImage, Output, 160, 255, ThresholdTypes.Binary);  //54//80
+
+            Mat img1 = new Mat();
+            img1 = 255 - BlurImage;
+            Output.SaveImage(pdf_Path + @"OCRImages\ProcessedKYCImage.jpeg");
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+
+    #region Directory Copying
+    //public static async Task DirectoryCopying(int interval, CancellationToken cancellationToken)
+    public static async Task DirectoryCopying()
+    {
+        try
+        {
+            //while (!cancellationToken.IsCancellationRequested)
+            //{
+                // Perform Task 1 logic here
+                Console.WriteLine($"Running DirectoryCopying at {DateTime.Now}");
+                string sFTPServerPath = SFTPServerPath;
+                string localFileServerPath = doc_Path + @"InsuranceDocs\";
+                string currDate = DateTime.Now.ToString("yyyyMMdd");
+                string[] dirs = Directory.GetDirectories(sFTPServerPath, "*", SearchOption.TopDirectoryOnly);
+
+                foreach (string dir in dirs)
+                {
+                    string fileName = Path.GetFileName(dir);
+
+                    if (currDate == fileName)
+                    {
+                        string[] proposalFolder = Directory.GetDirectories(dir, "*", SearchOption.TopDirectoryOnly);
+                        foreach (var eachPropposalNo in proposalFolder)
+                        {
+                            string proposalNumber = Path.GetFileName(eachPropposalNo);
+                            if (!Directory.Exists(localFileServerPath + proposalNumber))
+                            {
+                                Directory.CreateDirectory(localFileServerPath + proposalNumber);
+                            }
+                            string[] getAllFiles = Directory.GetFiles(eachPropposalNo);
+                            foreach (var file in getAllFiles)
+                            {
+                                var destFileName = localFileServerPath + proposalNumber + @"\" + Path.GetFileNameWithoutExtension(file) + Path.GetExtension(file);
+                                File.Copy(file, destFileName, true);
+                            }
+                        }
+                    }
+                }
+                // Delay for the specified interval
+            //    await Task.Delay(interval);
+
+            //    // Check if cancellation has been requested
+            //    if (cancellationToken.IsCancellationRequested)
+            //        break;
+            //}
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"{DateTime.Now}: Error in Directory Copying");
+            logger.Log($"{DateTime.Now}: Error in Directory Copying");
+            Console.WriteLine($"{DateTime.Now}: {ex.Message}");
+            logger.Log($"{DateTime.Now}: {ex.Message}");
+        }
+    }
+    //public static async Task ManagePolicyFoldersAsync(int interval, CancellationToken cancellationToken)
     public static async Task ManagePolicyFoldersAsync()
     {
-        string[] dirs = Directory.GetDirectories(doc_Path, "*", SearchOption.TopDirectoryOnly);
-        var requestDataJson = JsonSerializer.Serialize(dirs);
-        await SendHttpRequest(requestDataJson, "PolicyMasterAPI/CheckPolicyMaster", Convert.ToInt32(Enums.HttpMethod.POST));
+        //while (!cancellationToken.IsCancellationRequested)
+        //{
+            // Perform Task 3 logic here
+            Console.WriteLine($"Running ManagePolicyFolders at {DateTime.Now}");
+            string[] dirs = Directory.GetDirectories(doc_Path + @"InsuranceDocs\", "*", SearchOption.TopDirectoryOnly);
+            var requestDataJson = System.Text.Json.JsonSerializer.Serialize(dirs);
+            await SendHttpRequest(requestDataJson, "PolicyMasterAPI/CheckPolicyMaster", Convert.ToInt32(Enums.HttpMethod.POST));
+
+            // Delay for the specified interval
+        //    await Task.Delay(interval);
+
+        //    // Check if cancellation has been requested
+        //    if (cancellationToken.IsCancellationRequested)
+        //        break;
+        //}
     }
+    //public static async Task ManageDocsForPolicies(int interval, CancellationToken cancellationToken)
     public static async Task ManageDocsForPolicies()
     {
-        List<Policy_Docs_Model> policy_Docs_Model = new List<Policy_Docs_Model>();
-        string[] dirs = Directory.GetDirectories(doc_Path, "*", SearchOption.TopDirectoryOnly);
-        foreach (string dir in dirs)
-        {
-            string directoryName = dir.Split(@"\")[dir.Split(@"\").Length - 1];
-            string[] files = Directory.GetFiles(dir, "*", SearchOption.AllDirectories);
-            policy_Docs_Model.Add(new Policy_Docs_Model()
+        //while (!cancellationToken.IsCancellationRequested)
+        //{
+            // Perform Task 3 logic here
+            Console.WriteLine($"Running ManageDocsForPolicies task at {DateTime.Now}");
+            List<Policy_Docs_Model> policy_Docs_Model = new List<Policy_Docs_Model>();
+            string[] dirs = Directory.GetDirectories(doc_Path +@"InsuranceDocs\", "*", SearchOption.TopDirectoryOnly);
+            foreach (string dir in dirs)
             {
-                PolicyNo = Convert.ToInt32(directoryName),
-                Files=files
-            });
-        }
-        var requestDataJson = JsonSerializer.Serialize(policy_Docs_Model);
-        await SendHttpRequest(requestDataJson, "PolicyMasterAPI/ManageDocsForPolicies", Convert.ToInt32(Enums.HttpMethod.POST));
+                string directoryName = dir.Split(@"\")[dir.Split(@"\").Length - 1];
+                string[] files = Directory.GetFiles(dir, "*", SearchOption.AllDirectories);
+                string[] modifiedFiles = new string[files.Length];
+                for (int i = 0; i < files.Length; i++)
+                {
+                    modifiedFiles[i] = files[i].Replace(doc_Path, @"\");
+                }
+                policy_Docs_Model.Add(new Policy_Docs_Model()
+                {
+                    PolicyNo = Convert.ToInt32(directoryName),
+                    Files = modifiedFiles
+                });
+            }
+            var requestDataJson = System.Text.Json.JsonSerializer.Serialize(policy_Docs_Model);
+            await SendHttpRequest(requestDataJson, "PolicyMasterAPI/ManageDocsForPolicies", Convert.ToInt32(Enums.HttpMethod.POST));
+
+            // Delay for the specified interval
+        //    await Task.Delay(interval);
+
+        //    // Check if cancellation has been requested
+        //    if (cancellationToken.IsCancellationRequested)
+        //        break;
+        //}
+
     }
+    #endregion
+
+    #region OCRProcessing
+    //public static async Task ProcessPendingDocsAsync(int interval, CancellationToken cancellationToken)
     public static async Task ProcessPendingDocsAsync()
     {
+        //while (!cancellationToken.IsCancellationRequested)
+        //{
+        // Perform Task 1 logic here
+        Console.WriteLine($"Running ProcessPendingDocsAsync at {DateTime.Now}");
 
-        List<Document_Master> ocrData = new List<Document_Master>();
-        var ocrDataResponse = await SendHttpRequest("", "PolicyMasterAPI/GetPendingOCRData", Convert.ToInt32(Enums.HttpMethod.GET));
-        // Check if the response was successful
-        if (ocrDataResponse.IsSuccessStatusCode)
+        try
         {
-            // Read the response content
-            var ocrDataResponseContent = await ocrDataResponse.Content.ReadAsStringAsync();
-            ocrData = JsonSerializer.Deserialize<List<Document_Master>>(ocrDataResponseContent);
-            // Process the response as needed
-            Console.WriteLine("Response: " + ocrDataResponse);
-            logger.Log("Response: " + ocrDataResponse);
-        }
-        else
-        {
-            // Handle the error response
-            Console.WriteLine("Error: " + ocrDataResponse.StatusCode);
-            logger.Log("Error: " + ocrDataResponse.StatusCode);
-        }
-        foreach (var document in ocrData)
-        {
-            if (document.DocExtension==FileExtensions.Jpg|| document.DocExtension == FileExtensions.Png|| document.DocExtension == FileExtensions.Tiff)
+            List<Document_Master> ocrData = new List<Document_Master>();
+            var ocrDataResponse = await SendHttpRequest("", "PolicyMasterAPI/GetPendingOCRData", Convert.ToInt32(Enums.HttpMethod.GET));
+
+            // Check if the response was successful
+            if (ocrDataResponse.IsSuccessStatusCode)
             {
-                ImageProcessing(document);
+                // Read the response content
+                var ocrDataResponseContent = await ocrDataResponse.Content.ReadAsStringAsync();
+                ocrData = System.Text.Json.JsonSerializer.Deserialize<List<Document_Master>>(ocrDataResponseContent);
+                if (ocrData == null)
+                {
+                    return;
+                }
+                // Process the response as needed
+                Console.WriteLine("Response: " + ocrDataResponse);
+                logger.Log("Response: " + ocrDataResponse);
             }
-            else if (document.DocExtension == FileExtensions.Pdf)
+            else
             {
-                PDFProcessing(document);
+                // Handle the error response
+                Console.WriteLine("Error: " + ocrDataResponse.StatusCode);
+                logger.Log("Error: " + ocrDataResponse.StatusCode);
             }
-        }        
-    }
 
-    public static void ImageProcessing(Document_Master document)
-    {
+            DataTable dt = new DataTable();
 
-    }
-
-    public static void PDFProcessing(Document_Master document)
-    {
-
-    }
-
-    public static void OCRProcessing(string imagePath)
-    {
-        var str_text3 = "";
-        //Read Medical Parameters from JSON file
-        string text = File.ReadAllText(@"./CommonMedValues.json");
-        var common = JsonSerializer.Deserialize<List<CommonMedicalVal>>(text);
-
-        #region PDF To Tiff
-        //SautinSoft
-        //string imagePath = pdf_Path + @"BloodReportImages\"; //BloodTest
-        string imagePath = doc_Path + @"ECGTests\ECGTestImages\"; //ECG
-        //int pageCnt = pdfToImage(pdf_Path + "ApolloPlusBloodUrine.pdf", imagePath);
-        Console.WriteLine($"{DateTime.Now}: Converting PDF to images");
-        logger.Log("Converting PDF to images");
-
-        //var medReports = JsonSerializer.Deserialize<string>(File.ReadAllText(@"./MedicalReports.json"));
-
-
-        //BloodTest
-        //int pageCnt = ConvertPDFtoImages(pdf_Path + "VighnaharBloodUrineTest.pdf", imagePath);
-        //int pageCnt = ConvertPDFtoImages(pdf_Path + "ApolloPlusBloodUrine.pdf", imagePath);
-        //int pageCnt = ConvertPDFtoImages(pdf_Path + "ArthDiagnostics.pdf", imagePath);
-        //int pageCnt = ConvertPDFtoImages(pdf_Path + "CrystalBloodUrineTest.pdf", imagePath);
-        //int pageCnt = ConvertPDFtoImages(pdf_Path + "KarthikaBloodUrinetest.pdf", imagePath);
-
-        //ECG
-        //int pageCnt = ConvertPDFtoImages(@"G:\Workspace\Docs\ECGTests\ArthDiagnostics.pdf", imagePath);
-        //int pageCnt = ConvertPDFtoImages(@"G:\Workspace\Docs\ECGTests\GoldRushPathology.pdf", imagePath);
-        int pageCnt = ConvertPDFtoImages(@"G:\Workspace\Docs\ECGTests\KarthikaHealthCare.pdf", imagePath);
-
-        Console.WriteLine($"{DateTime.Now}: Images Generated");
-        logger.Log("Images Generated");
-        #endregion
-
-        string tessdataPath = ConfigurationManager.AppSettings["tessdataPath"].ToString();
-
-        DataTable dt = new DataTable();
-        dt.Columns.AddRange(new DataColumn[12]
-        {
+            dt.Columns.AddRange(new DataColumn[12]
+            {
                   new DataColumn("Level",typeof(int)),
                   new DataColumn("page_num",typeof(string)),
                   new DataColumn("block_num",typeof(string)),
@@ -336,60 +683,665 @@ static class Program
                   new DataColumn("height",typeof(string)),
                   new DataColumn("conf",typeof(string)),
                   new DataColumn("text",typeof(string))
-        });
-        try
-        {
-            Console.WriteLine($"{DateTime.Now}: Running OCR on PDF");
-            logger.Log("Running OCR on PDF");
-            for (int i = 1; i <= pageCnt; i++)
+            });
+
+
+            //foreach (var document in ocrData.FindAll(x => x.docType.ToUpper() != "OTHERS"))
+            foreach (var document in ocrData)
             {
-                //ECG
-                string imageFilePath = doc_Path + @"ECGTests\ECGTestImages\Page" + i + ".tiff";
-                Mat image = new Mat();
-                image = Cv2.ImRead(imageFilePath);
-                Mat Output = new Mat();
-                Cv2.Threshold(image, Output, 153, 255, ThresholdTypes.Binary);
-
-                Output.SaveImage(@"G:\Workspace\Docs\ECGTests\ECGTestImages\ProcessedImage.jpeg");
-
-
-                using (var tEngine = new TesseractEngine(tessdataPath, "eng", EngineMode.Default)) //creating the tesseract OCR engine with English as the language
+                Proposal_Master proposalData = new Proposal_Master();
+                string path = "";
+                if (document.docType == "ECG")
                 {
-                    tEngine.SetVariable("debug_file", "null");
+                    continue;
+                }
+                if (document.docType == "OTHERS")
+                {
+                    continue;
+                }
+                if (document.docType == "KYC")
+                {
+                    var requestDataJson = System.Text.Json.JsonSerializer.Serialize(document.policyNo);
+                    var proposalDataResponse = await SendHttpRequest("", "PolicyMasterAPI/GetProposalDetailsByPolicyNo?id=" + document.policyNo, Convert.ToInt32(Enums.HttpMethod.GET));
 
-                    //Load of the image file from the Pix object which is a wrapper for Leptonica PIX structure
-                    //using (var img = Pix.LoadFromFile(pdf_Path + @"BloodReportImages\Page" + i + ".tiff")) // Blood Test
-                    using (var img = Pix.LoadFromFile(pdf_Path + @"ECGTestImages\ProcessedImage.jpeg")) // ECG
+                    // Check if the response was successful
+                    if (proposalDataResponse.IsSuccessStatusCode)
                     {
-                        var pixFile = img.Rotate((float)(90 * Math.PI / 180.0f)); //ECG
-                        //pixFile = pixFile.Deskew();
-                        //pixFile.Save(pdf_Path + @"BloodReportImages\Page" + i + ".tiff");
-                        using (var page = tEngine.Process(img)) //process the specified image
+                        var proposalDataResponseContent = await proposalDataResponse.Content.ReadAsStringAsync();
+                        var jsonSerializerSettings = new JsonSerializerSettings
                         {
-                            var str_xml = page.GetHOCRText(0);
-                            str_text3 = page.GetTsvText(1);
-
+                            ContractResolver = new CamelCasePropertyNamesContractResolver()
+                        };
+                        proposalData = JsonConvert.DeserializeObject<Proposal_Master>(proposalDataResponseContent, jsonSerializerSettings);
+                        if (proposalData == null)
+                        {
+                            return;
                         }
+                        KYC_OCRPreProcessing(doc_Path + document.document_Path);
+                    }
+                    else
+                    {
+                        // Handle the error response
+                        Console.WriteLine("Error: " + ocrDataResponse.StatusCode);
+                        logger.Log("Error: " + ocrDataResponse.StatusCode);
                     }
                 }
-
-                string[] str_table = str_text3.Split('\n');
-
-                foreach (var item in str_table)
+                if (document.docExtension == FileExtensions.Jpg || document.docExtension == FileExtensions.Png || document.docExtension == FileExtensions.Tiff)
                 {
-                    if (item != "")
-                    {
-                        string[] str_item = item.Split('\t');
-
-                        dt.Rows.Add(str_item[0], str_item[1], str_item[2], str_item[3], str_item[4], str_item[5], str_item[6],
-                            str_item[7], str_item[8], str_item[9], str_item[10], str_item[11]);
-                    }
+                    if (document.docType == "KYC")
+                        path = pdf_Path + @"OCRImages\ProcessedKYCImage.jpeg";
+                    else
+                        path = doc_Path + document.document_Path;
+                    OCRProcessingForImages(doc_Path + document.document_Path, ref dt);
+                }
+                else if (document.docExtension == FileExtensions.Pdf)
+                {
+                    OCRProcessingForPDF(document, ref dt);
+                }
+                if (document.docType == "KYC")
+                {
+                    KYCOCRProcessingAsync(dt, proposalData, document);
+                }
+                if (document.docType == "Medical")
+                {
+                    await PassOCR(dt, document);
+                }
+                else
+                {
+                    if (document.docType != "OTHERS")
+                        await PassData(dt, document);
                 }
             }
-            Console.WriteLine($"{DateTime.Now}: OCR completed!");
-            logger.Log("OCR completed!");
+        }
+        //    // Delay for the specified interval
+        //    await Task.Delay(interval);
+
+        //    // Check if cancellation has been requested
+        //    if (cancellationToken.IsCancellationRequested)
+        //        break;
+        //}
+        catch (Exception ex)
+        {
+            Console.WriteLine($"{DateTime.Now}: Error in OCR Processing");
+            logger.Log($"{DateTime.Now}: Error in OCR Processing");
+            Console.WriteLine($"{DateTime.Now}: {ex.Message}");
+            logger.Log($"{DateTime.Now}: {ex.Message}");
+        }
+    }
+    public static async Task PassData(DataTable dt, Document_Master doc_Master)
+    {
+        try
+        {
+            string? Type = doc_Master.docType;
+            int policyNo = doc_Master.policyNo;
+            DataTable DtOCR_Value = new DataTable();
+            DtOCR_Value.Columns.AddRange(new DataColumn[2]
+            {
+                  new DataColumn("Field Name",typeof(string)),
+                  new DataColumn("Value",typeof(string))
+            });
+            if (Type == "MonthlyFinancial")
+            {
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    if (dt.Rows[i]["text"].ToString().ToUpper().Contains("GROSS")
+                         && dt.Rows[i + 1]["text"].ToString().ToUpper().Contains("EARNING"))
+                    {
+                        DataRow dr = DtOCR_Value.NewRow();
+                        dr["Field Name"] = "Gross Earnings";
+                        dr["Value"] = dt.Rows[i + 2]["text"].ToString();
+                        DtOCR_Value.Rows.Add(dr);
+                    }
+                    if (Convert.ToString(dt.Rows[i]["text"]).ToUpper().Contains("MONTH"))
+                    {
+                        string combinedWord = Convert.ToString(dt.Rows[i - 3]["text"]) + Convert.ToString(dt.Rows[i - 2]["text"]) + Convert.ToString(dt.Rows[i - 1]["text"]) + Convert.ToString(dt.Rows[i]["text"]);
+                        if (combinedWord.ToUpper().Contains("FORTHEMONTH"))
+                        {
+                            int cnt = i + 1;
+                            while (ContainsMonth(Convert.ToString(dt.Rows[cnt]["text"]).ToUpper()) == null)
+                            {
+                                cnt++;
+                            }
+                            string valString = Convert.ToString(dt.Rows[cnt]["text"]).ToUpper();
+                            DataRow drMonth = DtOCR_Value.NewRow();
+                            drMonth["Field Name"] = "Month";
+                            drMonth["Value"] = ContainsMonth(valString);
+                            DtOCR_Value.Rows.Add(drMonth);
+
+                            if (ContainsYear(valString) != null)
+                            {
+                                DataRow drYear = DtOCR_Value.NewRow();
+                                drYear["Field Name"] = "Year";
+                                drYear["Value"] = ContainsYear(valString);
+                                DtOCR_Value.Rows.Add(drYear);
+                            }
+                            i = cnt;
+                        }
+                    }
 
 
+                }
+                if (DtOCR_Value.Rows.Count > 0)
+                {
+                    Monthly_Finance_Master monthly_Finance_Master = new Monthly_Finance_Master();
+                    monthly_Finance_Master.PolicyNo = policyNo;
+                    decimal salaryAmt = decimal.Parse(RemoveSpecialCharacters(Convert.ToString(DtOCR_Value.Rows[2]["Value"])));
+                    monthly_Finance_Master.SalaryAmount = (int)salaryAmt;
+                    monthly_Finance_Master.Month = ConvertMonthToInt(Convert.ToString(DtOCR_Value.Rows[0]["Value"]));
+                    monthly_Finance_Master.Year = Convert.ToInt32(DtOCR_Value.Rows[1]["Value"]);
+                    monthly_Finance_Master.CreatedBy = "SYSTEM";
+                    monthly_Finance_Master.CreatedDate = DateTime.Now;
+                    monthly_Finance_Master.DocMasterID = doc_Master.docMasterID;
+                    var requestDataJson = System.Text.Json.JsonSerializer.Serialize(monthly_Finance_Master);
+                    await SendHttpRequest(requestDataJson, "PolicyMasterAPI/AddMonthlyFinanceValues", Convert.ToInt32(Enums.HttpMethod.POST));
+                }
+            }
+            if (Type == "YearlyFinancial")
+            {
+                //for (int i = 0; i < dt.Rows.Count; i++)
+                //{
+                //    if (dt.Rows[i]["text"].ToString().ToUpper().Contains("GROSS")
+                //         && dt.Rows[i + 1]["text"].ToString().ToUpper().Contains("EARNING"))
+                //    {
+                //        DataRow dr = DtOCR_Value.NewRow();
+                //        dr["Field Name"] = "Gross Earnings";
+                //        dr["Value"] = dt.Rows[i + 2]["text"].ToString();
+                //        DtOCR_Value.Rows.Add(dr);
+                //    }
+                //    if (Convert.ToString(dt.Rows[i]["text"]).ToUpper().Contains("MONTH"))
+                //    {
+                //        string combinedWord = Convert.ToString(dt.Rows[i - 3]["text"]) + Convert.ToString(dt.Rows[i - 2]["text"]) + Convert.ToString(dt.Rows[i - 1]["text"]) + Convert.ToString(dt.Rows[i]["text"]);
+                //        if (combinedWord.ToUpper().Contains("FORTHEMONTH"))
+                //        {
+                //            int cnt = i + 1;
+                //            while (ContainsMonth(Convert.ToString(dt.Rows[cnt]["text"]).ToUpper()) == null)
+                //            {
+                //                cnt++;
+                //            }
+                //            string valString = Convert.ToString(dt.Rows[cnt]["text"]).ToUpper();
+                //            DataRow drMonth = DtOCR_Value.NewRow();
+                //            drMonth["Field Name"] = "Month";
+                //            drMonth["Value"] = ContainsMonth(valString);
+                //            DtOCR_Value.Rows.Add(drMonth);
+
+                //            if (ContainsYear(valString) != null)
+                //            {
+                //                DataRow drYear = DtOCR_Value.NewRow();
+                //                drYear["Field Name"] = "Year";
+                //                drYear["Value"] = ContainsYear(valString);
+                //                DtOCR_Value.Rows.Add(drYear);
+                //            }
+                //            i = cnt;
+                //        }
+                //    }
+                //}
+
+                Yearly_Finance_Master yearly_Finance_Master = new Yearly_Finance_Master();
+                yearly_Finance_Master.PolicyNo = policyNo;
+                decimal salaryAmt = decimal.Parse(RemoveSpecialCharacters(Convert.ToString(DtOCR_Value.Rows[2]["Value"])));
+                yearly_Finance_Master.Form16_AY = (int)salaryAmt;
+                yearly_Finance_Master.Gross_AY = (int)salaryAmt;
+                yearly_Finance_Master.YearFrom = ConvertMonthToInt(Convert.ToString(DtOCR_Value.Rows[0]["Value"]));
+                yearly_Finance_Master.YearTo = Convert.ToInt32(DtOCR_Value.Rows[1]["Value"]);
+                yearly_Finance_Master.CreatedBy = "SYSTEM";
+                yearly_Finance_Master.CreatedDate = DateTime.Now;
+                yearly_Finance_Master.DocMasterID = doc_Master.docMasterID;
+                var requestDataJson = System.Text.Json.JsonSerializer.Serialize(yearly_Finance_Master);
+                await SendHttpRequest(requestDataJson, "PolicyMasterAPI/AddMonthlyFinanceValues", Convert.ToInt32(Enums.HttpMethod.POST));
+            }
+            else if (Type == "Proposal")
+            {
+                //Read Medical Parameters from JSON file
+                string text = File.ReadAllText(@"./ProposalValues.json");
+                var common = System.Text.Json.JsonSerializer.Deserialize<List<ProposalValues>>(text);
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    try
+                    {
+                        string value = Convert.ToString(dt.Rows[i]["text"]);
+                        if (RemoveSpecialCharacters(value) == "")
+                        {
+                            continue;
+                        }
+                        foreach (var item in common)
+                        {
+                            string[] alternatives = item.Alternatives.Split('|');
+                            bool match = Array.Exists(alternatives, x => (value.ToUpper()).Contains(x));
+                            if (!match)
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                string Match = value.ToUpper();
+                            }
+
+
+                            if (item.valueCaptured == true)
+                            {
+                                continue;
+                            }
+
+                            if (dt.Rows[i]["text"].ToString().ToUpper().Contains("PROPOSAL")
+                                && !dt.Rows[i + 1]["text"].ToString().ToUpper().Contains("NUMBER"))
+                            {
+                                continue;
+                            }
+
+                            if (dt.Rows[i]["text"].ToString().ToUpper().Contains("NAME")
+                                && !dt.Rows[i + 1]["text"].ToString().ToUpper().Contains("OF")
+                                && !dt.Rows[i + 2]["text"].ToString().ToUpper().Contains("ENTITY"))
+                            {
+                                continue;
+                            }
+
+                            if (
+                                (dt.Rows[i]["text"].ToString() + dt.Rows[i + 1]["text"].ToString() + dt.Rows[i + 2]["text"].ToString()).ToUpper().Contains("CITY")
+                                && !(dt.Rows[i]["text"].ToString() + dt.Rows[i + 1]["text"].ToString() + dt.Rows[i + 2]["text"].ToString()).ToUpper().Contains("DISTRICT")
+                                )
+                            {
+                                continue;
+                            }
+
+                            if (
+                                (dt.Rows[i]["text"].ToString() + dt.Rows[i + 1]["text"].ToString() + dt.Rows[i + 2]["text"].ToString()).ToUpper().Contains("PLAN")
+                                && !(dt.Rows[i]["text"].ToString() + dt.Rows[i + 1]["text"].ToString() + dt.Rows[i + 2]["text"].ToString()).ToUpper().Contains("COVER")
+                                )
+                            {
+                                continue;
+                            }
+
+
+
+
+                            if (dt.Rows[i]["text"].ToString().ToUpper().Contains("PIN")
+                                && !dt.Rows[i + 1]["text"].ToString().ToUpper().Contains("CODE"))
+                            {
+                                continue;
+                            }
+
+                            //if (dt.Rows[i]["text"].ToString().ToUpper().Contains("CURRENT")
+                            //    && dt.Rows[i + 1]["text"].ToString().ToUpper().Contains("RESIDENTIAL")
+                            //    && dt.Rows[i + 2]["text"].ToString().ToUpper().Contains("ADDRESS"))
+
+                            //{
+                            //    List<string> words_AddrValues = new List<string>();
+
+                            //    for (int j = 2; j <= 70; j++)
+                            //    {
+                            //        if (dt.Rows[i + j]["text"].ToString().ToUpper() != "")
+                            //        {
+                            //            words_AddrValues.Add(dt.Rows[i + j]["text"].ToString().ToUpper());
+                            //        }
+                            //    }
+                            //}
+
+
+
+                            //if (dt.Rows[i]["text"].ToString().ToUpper().Contains("PROPOSAL") && dt.Rows[i + 1]["text"].ToString().ToUpper() != "COUNT")
+                            //{
+                            //    continue;
+                            //}
+
+
+                            int left = Convert.ToInt32(dt.Rows[i]["left"]);
+                            int top = Convert.ToInt32(dt.Rows[i]["top"]);
+                            int width = Convert.ToInt32(dt.Rows[i]["width"]);
+                            int height = Convert.ToInt32(dt.Rows[i]["height"]);
+                            int line_num = Convert.ToInt32(dt.Rows[i]["lin_num"]);
+                            int block_num = Convert.ToInt32(dt.Rows[i]["block_num"]);
+                            int para_num = Convert.ToInt32(dt.Rows[i]["para_num"]);
+
+                            DataTable dt_MedReportValues = new DataTable();
+                            DataView dv = new DataView(dt);
+                            dv.RowFilter = "block_num = " + block_num + " AND para_num = " + para_num + " AND lin_num = " + line_num;
+                            dt_MedReportValues = dv.ToTable();
+
+                            List<string> words_ProposalValues = new List<string>();
+
+                            foreach (DataRow dr_test in dt_MedReportValues.Rows)
+                            {
+                                if (dr_test["text"].ToString() != "" && dr_test["text"].ToString() != " ")
+                                {
+                                    words_ProposalValues.Add(dr_test["text"].ToString());
+                                }
+                            }
+
+                            DataRow row = DtOCR_Value.NewRow();
+                            DtOCR_Value.Rows.Add(row);
+                            int rowNum = DtOCR_Value.Rows.Count - 1;
+
+                            DtOCR_Value.Rows[rowNum]["Field Name"] = item.FieldName;
+
+                            switch (value.ToUpper())
+                            {
+                                case "PROPOSAL":
+
+                                    for (int j = 0; j < words_ProposalValues.Count; j++)
+                                    {
+                                        string val = RemoveSpecialCharacters(words_ProposalValues[j]);
+                                        bool isNumeric = CheckWords(val, 2);
+
+                                        if (isNumeric)
+                                        {
+
+                                            DtOCR_Value.Rows[rowNum]["Value"] = val;
+                                            break;
+                                        }
+                                    }
+                                    break;
+
+                                case "TITLE":
+                                    DtOCR_Value.Rows[rowNum]["Value"] = dt.Rows[i + 1]["text"].ToString();
+
+                                    break;
+
+                                case "FIRST":
+                                    DtOCR_Value.Rows[rowNum]["Value"] = dt.Rows[i + 1]["text"].ToString();
+
+                                    break;
+
+                                case "MIDDLE":
+                                    DtOCR_Value.Rows[rowNum]["Value"] = dt.Rows[i + 1]["text"].ToString() == "" ? "--" : dt.Rows[i + 1]["text"].ToString();
+
+                                    break;
+
+                                case "LAST":
+                                    DtOCR_Value.Rows[rowNum]["Value"] = dt.Rows[i + 1]["text"].ToString();
+
+                                    break;
+
+                                case "BIRTH":
+                                    DtOCR_Value.Rows[rowNum]["Value"] = dt.Rows[i + 1]["text"].ToString();
+
+                                    break;
+
+                                case "EDUCATION":
+                                    DtOCR_Value.Rows[rowNum]["Value"] = dt.Rows[i + 1]["text"].ToString();
+
+                                    break;
+
+                                case "OCCUPATION":
+                                    int k = words_ProposalValues.IndexOf("Title");
+
+                                    DtOCR_Value.Rows[rowNum]["Value"] = words_ProposalValues[k + 1] + words_ProposalValues[k + 2] + words_ProposalValues[k + 3];
+
+                                    break;
+
+                                case "NAME":
+                                    DtOCR_Value.Rows[rowNum]["Value"] = dt.Rows[i + 7]["text"].ToString() + " " + dt.Rows[i + 8]["text"].ToString();
+
+                                    break;
+
+                                case "ANNUAL":
+                                    for (int j = 0; j < words_ProposalValues.Count; j++)
+                                    {
+                                        string val = RemoveSpecialCharacters(words_ProposalValues[j]);
+                                        bool isNumeric = CheckWords(val, 2);
+
+                                        if (isNumeric)
+                                        {
+                                            DtOCR_Value.Rows[rowNum]["Value"] = val;   //to get last numeric value
+                                        }
+                                    }
+
+                                    break;
+
+                                case "PERCENTAGE":
+                                    DtOCR_Value.Rows[rowNum]["Value"] = dt.Rows[i + 1]["text"].ToString();
+
+                                    break;
+
+
+
+                                case "CITY":
+                                case "CITY/":
+
+                                    if (item.FieldName == "Current City")
+                                    {
+                                        DtOCR_Value.Rows[rowNum]["Value"] = dt.Rows[i + 3]["text"].ToString();
+                                    }
+                                    else if (item.FieldName == "Permanent City")
+                                    {
+                                        DtOCR_Value.Rows[rowNum]["Value"] = dt.Rows[i + 2]["text"].ToString();
+                                    }
+
+                                    break;
+
+                                case "PIN":
+
+                                    DtOCR_Value.Rows[rowNum]["Value"] = dt.Rows[i + 2]["text"].ToString();
+
+                                    break;
+
+                                case "MOBILE":
+                                    for (int j = 0; j < words_ProposalValues.Count; j++)
+                                    {
+                                        string val = RemoveSpecialCharacters(words_ProposalValues[j]);
+
+                                        bool isNumeric = CheckWords(val, 2);
+
+                                        if (isNumeric)
+                                        {
+                                            if (val.Length == 10)
+                                            {
+                                                DtOCR_Value.Rows[rowNum]["Value"] = val;
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    break;
+
+                                case "E-MAIL":
+                                    DtOCR_Value.Rows[rowNum]["Value"] = words_ProposalValues.Last();
+
+                                    break;
+
+
+
+
+                                case "PLAN":
+                                    DtOCR_Value.Rows[rowNum]["Value"] = dt.Rows[i + 3]["text"].ToString();
+
+                                    break;
+
+
+                            }
+
+
+                            if (!string.IsNullOrEmpty(DtOCR_Value.Rows[rowNum]["Value"].ToString()))
+                                item.valueCaptured = true;
+                            else
+                            {
+                                item.valueCaptured = false;
+                                DtOCR_Value.Rows.Remove(row);
+                            }
+                            break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+
+                }
+                Proposal_Master proposal_Master = new Proposal_Master();
+                proposal_Master.PolicyNo = Convert.ToInt32(DtOCR_Value.Rows[0]["Value"]);
+                proposal_Master.Title = (string?)DtOCR_Value.Rows[1]["Value"];
+                proposal_Master.FirstName = (string?)DtOCR_Value.Rows[2]["Value"];
+                proposal_Master.MiddleName = (string?)DtOCR_Value.Rows[3]["Value"];
+                proposal_Master.LastName = (string?)DtOCR_Value.Rows[4]["Value"];
+                DateTime dob = DateTime.ParseExact((string)DtOCR_Value.Rows[5]["Value"], "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                string formattedDate = dob.ToString("yyyy-MM-dd");
+                proposal_Master.DOB = formattedDate;
+                proposal_Master.Education = (string?)DtOCR_Value.Rows[6]["Value"];
+                proposal_Master.Occupation = (string?)DtOCR_Value.Rows[7]["Value"];
+                proposal_Master.Employer = (string?)DtOCR_Value.Rows[8]["Value"];
+                proposal_Master.AnnualIncome = Convert.ToDecimal(DtOCR_Value.Rows[9]["Value"]);
+                proposal_Master.PercentageShare = Convert.ToDecimal(DtOCR_Value.Rows[10]["Value"]);
+                proposal_Master.CurrentCity = (string?)DtOCR_Value.Rows[11]["Value"];
+                proposal_Master.CurrentPinCode = Convert.ToDecimal(DtOCR_Value.Rows[12]["Value"]);
+                proposal_Master.MobileNo = Convert.ToDecimal(DtOCR_Value.Rows[13]["Value"]);
+                proposal_Master.EmailID = (string?)DtOCR_Value.Rows[14]["Value"];
+                proposal_Master.PermanentCity = (string?)DtOCR_Value.Rows[15]["Value"];
+                proposal_Master.PermanentPinCode = (string?)DtOCR_Value.Rows[16]["Value"];
+                proposal_Master.SumAssured = Convert.ToDecimal(DtOCR_Value.Rows[17]["Value"]);
+                //proposal_Master.Gender = "";
+                //proposal_Master.RelationWithProposer = "";
+                proposal_Master.CreatedDate = DateTime.Now;
+                proposal_Master.CreatedBy = "SYSTEM";
+                proposal_Master.DocMasterID = doc_Master.docMasterID;
+
+                var requestDataJson = System.Text.Json.JsonSerializer.Serialize(proposal_Master);
+                await SendHttpRequest(requestDataJson, "PolicyMasterAPI/AddProposalValues", Convert.ToInt32(Enums.HttpMethod.POST));
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error");
+        }
+    }
+    public static void OCRProcessingForImages(string path, ref DataTable dt)
+    {
+        var str_text3 = "";
+        Console.WriteLine($"{DateTime.Now}: Running OCR for image " + path);
+        logger.Log("Running OCR for image " + path);
+
+        //ECG
+        //string imageFilePath = doc_Path + @"ECGTests\ECGTestImages\Page" + i + ".tiff";
+        //Mat image = new Mat();
+        //image = Cv2.ImRead(imageFilePath);
+        //Mat Output = new Mat();
+        //Cv2.Threshold(image, Output, 153, 255, ThresholdTypes.Binary);
+        //Output.SaveImage(@"G:\Workspace\Docs\ECGTests\ECGTestImages\ProcessedImage.jpeg");
+
+
+        using (var tEngine = new TesseractEngine(tessdataPath, "eng", EngineMode.Default)) //creating the tesseract OCR engine with English as the language
+        {
+            tEngine.SetVariable("debug_file", "null");
+
+            //Load of the image file from the Pix object which is a wrapper for Leptonica PIX structure
+            using (var img = Pix.LoadFromFile(path)) // Blood Test
+            //using (var img = Pix.LoadFromFile(pdf_Path + @"ECGTestImages\ProcessedImage.jpeg")) // ECG
+            {
+                var pixFile = img.Rotate((float)(90 * Math.PI / 180.0f)); //ECG
+                //pixFile = pixFile.Deskew();
+                using (var page = tEngine.Process(img)) //process the specified image
+                {
+                    var str_xml = page.GetHOCRText(0);
+                    str_text3 = page.GetTsvText(1);
+
+                }
+            }
+        }
+
+        string[] str_table = str_text3.Split('\n');
+
+        foreach (var item in str_table)
+        {
+            if (item != "")
+            {
+                string[] str_item = item.Split('\t');
+
+                dt.Rows.Add(str_item[0], str_item[1], str_item[2], str_item[3], str_item[4], str_item[5], str_item[6],
+                    str_item[7], str_item[8], str_item[9], str_item[10], str_item[11]);
+            }
+        }
+        Console.WriteLine($"{DateTime.Now}: OCR completed!");
+        logger.Log("OCR completed!");
+    }
+    public static void OCRProcessingForPDF(Document_Master document, ref DataTable dt)
+    {
+        Console.WriteLine($"{DateTime.Now}: Running OCR for " + document.documentName);
+        Console.WriteLine($"{DateTime.Now}: Converting PDF to images");
+        logger.Log("Converting PDF to images");
+
+        //SautinSoft
+        string imagePath = pdf_Path + @"OCRImages\";
+        int pageCnt = ConvertPDFtoImages(doc_Path + document.document_Path, imagePath);
+
+        Console.WriteLine($"{DateTime.Now}: Images Generated");
+        logger.Log("Images Generated");
+
+        for (int i = 1; i <= pageCnt; i++)
+        {
+            OCRProcessingForImages(pdf_Path + @"OCRImages\Page" + i + ".tiff", ref dt);
+        }
+    }
+    public static async Task PassOCR(DataTable dt, Document_Master document_Master)
+    {
+        try
+        {
+            DataTable dtOCR = ManipulatingOCRData(dt);
+            RemoveBlankData(ref dtOCR);
+
+            Med_Report_Master med_Report_Master = new Med_Report_Master()
+            {
+                PolicyNo = document_Master.policyNo,
+                DocMasterID = document_Master.docMasterID,
+                ReportType = document_Master.docType,
+                ReportName = document_Master.documentName,
+                ReportDate = DateTime.Now,
+                Age = 20
+            };
+
+            var requestDataJson = System.Text.Json.JsonSerializer.Serialize(med_Report_Master);
+            var med_Report_Master_Response = await SendHttpRequest(requestDataJson, "PolicyMasterAPI/AddMedicalReport", Convert.ToInt32(Enums.HttpMethod.POST));
+
+            // Check if the response was successful
+            if (med_Report_Master_Response.IsSuccessStatusCode)
+            {
+                // Read the response content
+                var med_Report_Master_Content = await med_Report_Master_Response.Content.ReadAsStringAsync();
+
+                // Process the response as needed
+                Console.WriteLine("Response: " + med_Report_Master_Response);
+                logger.Log("Response: " + med_Report_Master_Response);
+
+                List<Med_Report_Details> med_Report_Details = new List<Med_Report_Details>();
+
+                foreach (DataRow dr in dtOCR.Rows)
+                {
+                    bool isNumeric = CheckWords(Convert.ToString(dr["Result"]), 2);
+                    med_Report_Details.Add(new Med_Report_Details()
+                    {
+                        ReportID = Convert.ToInt32(med_Report_Master_Content),
+                        TestName = Convert.ToString(dr["Test"]),
+                        NumericTestValue = isNumeric ? Convert.ToDouble(dr["Result"]) : 0,
+                        StringTestValue = !isNumeric ? Convert.ToString(dr["Result"]) : "",
+                        RangeFrom = dr["RangeFrom"].Equals(System.DBNull.Value) ? 0 : Convert.ToDouble(dr["RangeFrom"]),
+                        RangeTill = dr["RangeTill"].Equals(System.DBNull.Value) ? 0 : Convert.ToDouble(dr["RangeTill"]),
+                        HealthStatus = Convert.ToString(dr["HealthStatus"]),
+                        CreatedDate = DateTime.Now,
+                        ModifiedDate = null,
+                        CreatedBy = "SYSTEM"
+                    });
+                }
+
+                requestDataJson = System.Text.Json.JsonSerializer.Serialize(med_Report_Details);
+                await SendHttpRequest(requestDataJson, "PolicyMasterAPI/AddMedicalValues", Convert.ToInt32(Enums.HttpMethod.POST));
+
+            }
+            else
+            {
+                // Handle the error response
+                Console.WriteLine("Error: " + med_Report_Master_Response.StatusCode);
+                logger.Log("Error: " + med_Report_Master_Response.StatusCode);
+            }
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+    public static DataTable ManipulatingOCRData(DataTable dt)
+    {
+        //Read Medical Parameters from JSON file
+        string text = File.ReadAllText(@"./CommonMedValues.json");
+        var common = System.Text.Json.JsonSerializer.Deserialize<List<CommonMedicalVal>>(text);
+        try
+        {
             DataTable DtOCR_Value = new DataTable();
             DtOCR_Value.Columns.AddRange(new DataColumn[5]
             {
@@ -410,13 +1362,9 @@ static class Program
                         continue;
                     }
 
-
                     if ((value.ToUpper().Contains("URINE") && dt.Rows[i + 1]["text"].ToString().ToUpper().Contains("EXAMINATION"))
                         || value.ToUpper().Contains("URINE") && dt.Rows[i + 1]["text"].ToString().ToUpper().Contains("ROUTINE") && dt.Rows[i + 2]["text"].ToString().ToUpper().Contains("EXAMINATION"))
                     {
-                        DataRow drHeader = DtOCR_Value.NewRow();
-                        drHeader["Test"] = "URINE EXAMINATION";
-                        DtOCR_Value.Rows.Add(drHeader);
                         var urineMenu = common.FindAll(x => x.IsSubMenu == true);
                         var menu = common.FindAll(x => x.IsSubMenu == false);
 
@@ -433,8 +1381,6 @@ static class Program
                             bool nonurine = menu.Exists(x => x.TestName == v.ToUpper());
                             if (nonurine)
                                 break;
-
-
 
                             Console.WriteLine($"{DateTime.Now}: Urine Test Keyword: " + v);
                             logger.Log("Keyword: " + v);
@@ -674,101 +1620,25 @@ static class Program
 
             }
 
-            var dir = new DirectoryInfo(imagePath);
-            if (dir.Exists)
-            {
-                dir.Delete(true);
-            }
+            //var dir = new DirectoryInfo(imagePath);
+            //if (dir.Exists)
+            //{
+            //    dir.Delete(true);
+            //}
 
-            DataSet ds = new DataSet();
-
-            DtOCR_Value.TableName = "OCR_Value";
-            ds.Tables.Add(DtOCR_Value);
-
-            List<Policy_Master> policies = new List<Policy_Master>();
-            int ProposalNumber = 0;
-
-            foreach (DataRow dr in DtOCR_Value.Rows)
-            {
-                policies.Add(new Policy_Master()
-                {
-                    PolicyNo = ProposalNumber,
-                    PolicyStatusCode = 0,
-                    CreatedDate = DateTime.Now,
-                    CreatedBy = "SYSTEM"
-                });
-            }
-
-            var requestDataJson = JsonSerializer.Serialize(policies);
-            //await SendHttpRequest(requestDataJson, "PolicyMasterAPI/AddMedicalValues");
-
-            using (XLWorkbook wb = new XLWorkbook())
-            {
-                wb.Worksheets.Add(ds);
-
-                wb.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-                wb.Style.Font.Bold = true;
-
-                string OutPutFile = "";
-                string OutputPath = output_Path;
-
-                string filePath = output_Path;
-
-                string CurrDate = DateTime.Now.ToString("yyyyMMddHHmmss");
-
-                string OutputFileName = "file_Name" + CurrDate + ".xlsx";
-
-                wb.SaveAs(filePath + "\\" + OutputFileName);
-
-                OutPutFile = filePath + "\\" + OutputFileName;
-
-                filePath = "";
-            }
-
+            return DtOCR_Value;
         }
         catch (Exception e)
         {
             Console.WriteLine($"{DateTime.Now}: Unexpected Error: " + e.Message);
             logger.Log($"Error occurred: {e.Message}");
-
+            throw e;
         }
-
     }
-    public static async Task MyMethodAsync()
-    {
-        Task<int> longRunningTask = LongRunningOperationAsync();
 
-        // run the below code in separate thread
-        //some code here 
-        //some code here
-        for (int i = 0; i < 10000000000; i++)
-        {
-            Console.WriteLine(i); //SET BREAK POINT HERE
-        }
-        //some code here
+    #endregion
 
-        //and now we call await on the task 
-        int result = await longRunningTask;
-    }
-    public static async Task<int> LongRunningOperationAsync() // assume we return an int from this long running operation 
-    {
-        int timerDelayInSecs = Convert.ToInt32(ConfigurationManager.AppSettings["timerDelayInSecs"]);
-        bool retry = true;
 
-        using (AutoResetEvent wait = new AutoResetEvent(false))
-        {
-            while (retry)
-            {
 
-                //Do Work here
-                //_ = ManagePolicyFoldersAsync();
-                //_ = ManageDocsForPolicies();
-                OCRProcessing();
-                //await Task.Delay(43200000); //12 hour delay
-                await Task.Delay(timerDelayInSecs * 1000); //SET BREAK POINT HERE
-            }
-        }
 
-        return 1;
-    }
 }

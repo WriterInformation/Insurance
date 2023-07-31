@@ -1,13 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace InsuranceBPaaS_WebAPI.Models
+namespace InsuranceBPaaSWebAPI.Models
 {
-    public class Finance_Master
+    public class Monthly_Finance_Master
     {
         [Key]
-        public int FinanceMasterId { get; set; }
+        public int MonthlyFinance_Id { get; set; }
 
         [Display(Name = "Policy No")]
         public virtual int PolicyNo { get; set; }
@@ -21,9 +22,6 @@ namespace InsuranceBPaaS_WebAPI.Models
         public virtual Document_Master? document_Master { get; set; }
 
         public int? SalaryAmount { get; set; }
-        public int? coi { get; set; }
-        public int? Gross_AY { get; set; }
-        public int? Form16_AY { get; set; }
         public int? CrifIncome { get; set; }
         public int? CIBILScore { get; set; }
         public int? CTCAnnualIncome { get; set; }

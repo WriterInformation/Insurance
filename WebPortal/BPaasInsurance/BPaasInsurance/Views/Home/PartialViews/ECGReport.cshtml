@@ -1,0 +1,34 @@
+﻿@model BPaasInsurance.Med_Report_Details
+
+
+@using (Html.BeginForm("SaveECGReportDetails", "Home", FormMethod.Post))
+{
+<div id="Body_ECG" class="ECG panel-body border overflow-auto dv_ecg_details">
+    @Html.HiddenFor(m => m.ReportDetailsID)
+    @Html.HiddenFor(m => m.ReportID)
+    @Html.HiddenFor(m => m.CreatedDate)
+    @Html.HiddenFor(m => m.CreatedBy)
+
+    <table class="margin_left">
+        <tr>
+            <td>Status:</td>
+            <td>
+                @Html.DropDownListFor(m => m.HealthStatus,
+            new SelectList(Enum.GetValues(typeof(Status))),
+            "Select Status", new { @style = "  width: 130px;", @class = "form-control" })
+
+            </td>
+        </tr>
+        <tr>
+            <td>Opinion:</td>
+            <td>@Html.TextAreaFor(m => m.Opinion, new { @style = "  width: 800px;", @class = "form-control" })</td>
+        </tr>
+    </table>
+
+</div>
+<div class="buttonFooter">
+    <input type="submit" value="Save" class="btn btn-success" style="border-radius: 16px; width: 12%;" />
+    <button type="button" class="btn btn-secondary" style="border-radius: 16px; width: 12%;">Reset</button>
+    <input type="button" class="btn btn-secondary" value="Cancel" style="border-radius: 16px; width: 12%;" onclick="@("window.location.href='" + @Url.Action("Index", "Home") + "'");" />
+</div>
+}

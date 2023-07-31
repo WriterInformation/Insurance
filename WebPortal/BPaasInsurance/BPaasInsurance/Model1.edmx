@@ -4,7 +4,85 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="InsuranceBPaaSModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="InsuranceBPaaSModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="CaseSummary">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PolicyNo" Type="int" Nullable="false" />
+          <Property Name="CustomerName" Type="varchar" MaxLength="200" />
+          <Property Name="Gender" Type="varchar" MaxLength="200" />
+          <Property Name="Ageaspersystem" Type="varchar" MaxLength="200" />
+          <Property Name="Education" Type="varchar" MaxLength="200" />
+          <Property Name="KYC" Type="varchar" MaxLength="200" />
+          <Property Name="IDProof" Type="varchar" MaxLength="200" />
+          <Property Name="AddressProof" Type="varchar" MaxLength="200" />
+          <Property Name="Photo" Type="varchar" MaxLength="200" />
+          <Property Name="EnterPincode" Type="varchar" MaxLength="200" />
+          <Property Name="City" Type="varchar" MaxLength="200" />
+          <Property Name="VSMCity" Type="varchar" MaxLength="200" />
+          <Property Name="Occupation" Type="varchar" MaxLength="200" />
+          <Property Name="MedSumAssured" Type="varchar" MaxLength="200" />
+          <Property Name="FinancialSumAssured" Type="varchar" MaxLength="200" />
+          <Property Name="PreviousPolicyMLI" Type="varchar" MaxLength="200" />
+          <Property Name="PreviousPolicyMLISumAssured" Type="varchar" MaxLength="200" />
+          <Property Name="PreviousPolicyOther" Type="varchar" MaxLength="200" />
+          <Property Name="PreviousPolicyOtherSumAssured" Type="varchar" MaxLength="200" />
+          <Property Name="DeclaredIncome" Type="varchar" MaxLength="200" />
+          <Property Name="CrifScore" Type="varchar" MaxLength="200" />
+          <Property Name="CrifIncome" Type="varchar" MaxLength="200" />
+          <Property Name="AppliedSumAssured" Type="varchar" MaxLength="200" />
+          <Property Name="Financialdocument" Type="varchar" MaxLength="200" />
+          <Property Name="TeleMERReport" Type="varchar" MaxLength="200" />
+          <Property Name="MedicalRequired" Type="varchar" MaxLength="200" />
+          <Property Name="MedicalReceived" Type="varchar" MaxLength="200" />
+          <Property Name="MedicalReportDate" Type="varchar" MaxLength="200" />
+          <Property Name="Height" Type="varchar" MaxLength="200" />
+          <Property Name="Weight" Type="varchar" MaxLength="200" />
+          <Property Name="BMI" Type="varchar" MaxLength="200" />
+          <Property Name="Smoker" Type="varchar" MaxLength="200" />
+          <Property Name="UrineCotininetest" Type="varchar" MaxLength="200" />
+          <Property Name="ECGReport" Type="varchar" MaxLength="200" />
+          <Property Name="Bloodprofile_CBCFinding" Type="varchar" MaxLength="200" />
+          <Property Name="Medicalrecommendation" Type="varchar" MaxLength="200" />
+          <Property Name="Financialrecommendation" Type="varchar" MaxLength="200" />
+          <Property Name="Finalrecommendation" Type="varchar" MaxLength="200" />
+          <Property Name="FinalDecision" Type="varchar" MaxLength="200" />
+          <Property Name="Islock" Type="char" MaxLength="1" />
+          <Property Name="lockby" Type="varchar" MaxLength="20" />
+          <Property Name="QCby" Type="varchar" MaxLength="20" />
+          <Property Name="QCbyon" Type="datetime" />
+          <Property Name="status" Type="int" />
+          <Property Name="lastmonthsal" Type="int" />
+          <Property Name="Secondlastmonthsal" Type="int" />
+          <Property Name="Thirdlastmonthsal" Type="int" />
+          <Property Name="CustomerEligibilityOnSalary" Type="int" />
+          <Property Name="LastYrGross_AY" Type="int" />
+          <Property Name="SecondLastYrGross_AY" Type="int" />
+          <Property Name="ThirdLastYrGross_AY" Type="int" />
+          <Property Name="CustomerEligibilityOnITR" Type="int" />
+          <Property Name="LastYrForm16" Type="int" />
+          <Property Name="SecondLastYrForm16" Type="int" />
+          <Property Name="ThirdLastYrForm16" Type="int" />
+          <Property Name="CustomerEligibilityOnForm16" Type="int" />
+          <Property Name="BankStmt_LastMonthSal" Type="int" />
+          <Property Name="BankStmt_SecLastMonthSal" Type="int" />
+          <Property Name="BankStmt_ThirdLastMonthSal" Type="int" />
+          <Property Name="CustomerEligibilityOnBankStmt" Type="int" />
+          <Property Name="CreatedDate" Type="datetime" />
+          <Property Name="CreatedBy" Type="varchar" MaxLength="50" />
+          <Property Name="ModifiedDate" Type="datetime" />
+          <Property Name="ModifiedBy" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="DocType_Master">
+          <Key>
+            <PropertyRef Name="DocTypeId" />
+          </Key>
+          <Property Name="DocTypeId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="DocType" Type="varchar" MaxLength="50" />
+          <Property Name="FileNames" Type="varchar(max)" />
+        </EntityType>
         <EntityType Name="Document_Master">
           <Key>
             <PropertyRef Name="DocMasterID" />
@@ -22,17 +100,28 @@
           <Property Name="ModifiedDate" Type="datetime" />
           <Property Name="ModifiedBy" Type="varchar" MaxLength="50" />
         </EntityType>
-        <EntityType Name="KYC_Doc_Master">
+        <EntityType Name="IncomeAllowableFactors">
+          <Key>
+            <PropertyRef Name="IAF_Id" />
+          </Key>
+          <Property Name="IAF_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AgeFrom" Type="int" />
+          <Property Name="AgeTill" Type="int" />
+          <Property Name="MultiplierFactor" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="Income_Above_5L" Type="int" />
+        </EntityType>
+        <EntityType Name="KYC_Verify_Master">
           <Key>
             <PropertyRef Name="DocID" />
           </Key>
           <Property Name="DocID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="PolicyNo" Type="int" Nullable="false" />
-          <Property Name="DocType" Type="int" Nullable="false" />
-          <Property Name="Name" Type="varchar" MaxLength="50" />
-          <Property Name="IDNumber" Type="varchar" MaxLength="50" />
-          <Property Name="Address" Type="varchar" MaxLength="200" />
-          <Property Name="DOB" Type="datetime" />
+          <Property Name="DocMasterID" Type="int" Nullable="false" />
+          <Property Name="Name" Type="int" />
+          <Property Name="IDNumber" Type="int" />
+          <Property Name="City" Type="int" />
+          <Property Name="Pincode" Type="int" />
+          <Property Name="DOB" Type="int" />
           <Property Name="CreatedDate" Type="datetime" />
           <Property Name="CreatedBy" Type="varchar" MaxLength="50" />
           <Property Name="ModifiedDate" Type="datetime" />
@@ -54,6 +143,7 @@
           <Property Name="ModifiedDate" Type="datetime" />
           <Property Name="ModifiedBy" Type="varchar" MaxLength="50" />
           <Property Name="StringTestValue" Type="varchar" MaxLength="50" />
+          <Property Name="Opinion" Type="varchar(max)" />
         </EntityType>
         <EntityType Name="Med_Report_Master">
           <Key>
@@ -61,10 +151,32 @@
           </Key>
           <Property Name="ReportID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="PolicyNo" Type="int" Nullable="false" />
+          <Property Name="DocMasterID" Type="int" Nullable="false" />
           <Property Name="ReportType" Type="varchar" MaxLength="50" />
           <Property Name="ReportName" Type="varchar" MaxLength="50" />
           <Property Name="ReportDate" Type="datetime" />
           <Property Name="Age" Type="int" />
+          <Property Name="CreatedDate" Type="datetime" />
+          <Property Name="CreatedBy" Type="varchar" MaxLength="50" />
+          <Property Name="ModifiedDate" Type="datetime" />
+          <Property Name="ModifiedBy" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'InsuranceBPaaS.dbo.Monthly_Finance_Master' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="Monthly_Finance_Master">
+          <Key>
+            <PropertyRef Name="MonthlyFinance_Id" />
+            <PropertyRef Name="PolicyNo" />
+            <PropertyRef Name="DocMasterID" />
+          </Key>
+          <Property Name="MonthlyFinance_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PolicyNo" Type="int" Nullable="false" />
+          <Property Name="DocMasterID" Type="int" Nullable="false" />
+          <Property Name="SalaryAmount" Type="int" />
+          <Property Name="CrifIncome" Type="int" />
+          <Property Name="CIBILScore" Type="int" />
+          <Property Name="Month" Type="int" />
+          <Property Name="Year" Type="int" />
           <Property Name="CreatedDate" Type="datetime" />
           <Property Name="CreatedBy" Type="varchar" MaxLength="50" />
           <Property Name="ModifiedDate" Type="datetime" />
@@ -81,6 +193,37 @@
           <Property Name="ModifiedDate" Type="datetime" />
           <Property Name="ModifiedBy" Type="varchar" MaxLength="50" />
         </EntityType>
+        <EntityType Name="Proposal_Master">
+          <Key>
+            <PropertyRef Name="ProposalNo" />
+          </Key>
+          <Property Name="ProposalNo" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PolicyNo" Type="int" Nullable="false" />
+          <Property Name="DocMasterID" Type="int" Nullable="false" />
+          <Property Name="Title" Type="varchar" MaxLength="50" />
+          <Property Name="FirstName" Type="varchar" MaxLength="50" />
+          <Property Name="MiddleName" Type="varchar" MaxLength="50" />
+          <Property Name="LastName" Type="varchar" MaxLength="50" />
+          <Property Name="DOB" Type="varchar" MaxLength="50" />
+          <Property Name="Education" Type="varchar" MaxLength="50" />
+          <Property Name="Occupation" Type="varchar" MaxLength="50" />
+          <Property Name="Employer" Type="varchar" MaxLength="50" />
+          <Property Name="AnnualIncome" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="PercentageShare" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="CurrentCity" Type="varchar" MaxLength="50" />
+          <Property Name="CurrentPinCode" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="MobileNo" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="EmailID" Type="varchar" MaxLength="50" />
+          <Property Name="PermanentCity" Type="varchar" MaxLength="50" />
+          <Property Name="PermanentPinCode" Type="varchar" MaxLength="50" />
+          <Property Name="SumAssured" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="Gender" Type="varchar" MaxLength="50" />
+          <Property Name="RelationWithProposer" Type="varchar" MaxLength="50" />
+          <Property Name="CreatedDate" Type="datetime" />
+          <Property Name="CreatedBy" Type="varchar" MaxLength="50" />
+          <Property Name="ModifiedDate" Type="datetime" />
+          <Property Name="ModifiedBy" Type="varchar" MaxLength="50" />
+        </EntityType>
         <EntityType Name="Type_Master">
           <Key>
             <PropertyRef Name="TypeId" />
@@ -88,6 +231,28 @@
           <Property Name="TypeId" Type="int" Nullable="false" />
           <Property Name="TypeName" Type="varchar" MaxLength="50" />
           <Property Name="TypeCategory" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'InsuranceBPaaS.dbo.Yearly_Finance_Master' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="Yearly_Finance_Master">
+          <Key>
+            <PropertyRef Name="YearlyFinance_Id" />
+            <PropertyRef Name="PolicyNo" />
+            <PropertyRef Name="DocMasterID" />
+          </Key>
+          <Property Name="YearlyFinance_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PolicyNo" Type="int" Nullable="false" />
+          <Property Name="DocMasterID" Type="int" Nullable="false" />
+          <Property Name="coi" Type="int" />
+          <Property Name="Gross_AY" Type="int" />
+          <Property Name="Form16_AY" Type="int" />
+          <Property Name="YearFrom" Type="int" />
+          <Property Name="YearTo" Type="int" />
+          <Property Name="CreatedDate" Type="datetime" />
+          <Property Name="CreatedBy" Type="varchar" MaxLength="50" />
+          <Property Name="ModifiedDate" Type="datetime" />
+          <Property Name="ModifiedBy" Type="varchar" MaxLength="50" />
+          <Property Name="DateRange" Type="varchar" MaxLength="50" />
         </EntityType>
         <Association Name="FK__Document___Polic__412EB0B6">
           <End Role="Policy_Master" Type="Self.Policy_Master" Multiplicity="1" />
@@ -101,19 +266,43 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__KYC_Doc_M__Polic__4222D4EF">
+        <Association Name="FK__KYC_Verif__DocMa__43D61337">
+          <End Role="Document_Master" Type="Self.Document_Master" Multiplicity="1" />
+          <End Role="KYC_Verify_Master" Type="Self.KYC_Verify_Master" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Document_Master">
+              <PropertyRef Name="DocMasterID" />
+            </Principal>
+            <Dependent Role="KYC_Verify_Master">
+              <PropertyRef Name="DocMasterID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__KYC_Verif__Polic__44CA3770">
           <End Role="Policy_Master" Type="Self.Policy_Master" Multiplicity="1" />
-          <End Role="KYC_Doc_Master" Type="Self.KYC_Doc_Master" Multiplicity="*" />
+          <End Role="KYC_Verify_Master" Type="Self.KYC_Verify_Master" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Policy_Master">
               <PropertyRef Name="PolicyNo" />
             </Principal>
-            <Dependent Role="KYC_Doc_Master">
+            <Dependent Role="KYC_Verify_Master">
               <PropertyRef Name="PolicyNo" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Med_Repor__Repor__4F7CD00D">
+        <Association Name="FK__Med_Repor__DocMa__18EBB532">
+          <End Role="Document_Master" Type="Self.Document_Master" Multiplicity="1" />
+          <End Role="Med_Report_Master" Type="Self.Med_Report_Master" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Document_Master">
+              <PropertyRef Name="DocMasterID" />
+            </Principal>
+            <Dependent Role="Med_Report_Master">
+              <PropertyRef Name="DocMasterID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Med_Repor__Repor__1BC821DD">
           <End Role="Med_Report_Master" Type="Self.Med_Report_Master" Multiplicity="1" />
           <End Role="Med_Report_Details" Type="Self.Med_Report_Details" Multiplicity="*" />
           <ReferentialConstraint>
@@ -125,15 +314,27 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Med_Repor__Repor__5070F446">
-          <End Role="Med_Report_Master" Type="Self.Med_Report_Master" Multiplicity="1" />
-          <End Role="Med_Report_Details" Type="Self.Med_Report_Details" Multiplicity="*" />
+        <Association Name="FK__Monthly_F__DocMa__531856C7">
+          <End Role="Document_Master" Type="Self.Document_Master" Multiplicity="1" />
+          <End Role="Monthly_Finance_Master" Type="Self.Monthly_Finance_Master" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="Med_Report_Master">
-              <PropertyRef Name="ReportID" />
+            <Principal Role="Document_Master">
+              <PropertyRef Name="DocMasterID" />
             </Principal>
-            <Dependent Role="Med_Report_Details">
-              <PropertyRef Name="ReportID" />
+            <Dependent Role="Monthly_Finance_Master">
+              <PropertyRef Name="DocMasterID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Monthly_F__Polic__540C7B00">
+          <End Role="Policy_Master" Type="Self.Policy_Master" Multiplicity="1" />
+          <End Role="Monthly_Finance_Master" Type="Self.Monthly_Finance_Master" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Policy_Master">
+              <PropertyRef Name="PolicyNo" />
+            </Principal>
+            <Dependent Role="Monthly_Finance_Master">
+              <PropertyRef Name="PolicyNo" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -149,36 +350,180 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK__Proposal___DocMa__5BAD9CC8">
+          <End Role="Document_Master" Type="Self.Document_Master" Multiplicity="1" />
+          <End Role="Proposal_Master" Type="Self.Proposal_Master" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Document_Master">
+              <PropertyRef Name="DocMasterID" />
+            </Principal>
+            <Dependent Role="Proposal_Master">
+              <PropertyRef Name="DocMasterID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Proposal___DocMa__5E8A0973">
+          <End Role="Document_Master" Type="Self.Document_Master" Multiplicity="1" />
+          <End Role="Proposal_Master" Type="Self.Proposal_Master" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Document_Master">
+              <PropertyRef Name="DocMasterID" />
+            </Principal>
+            <Dependent Role="Proposal_Master">
+              <PropertyRef Name="DocMasterID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Proposal___Polic__5CA1C101">
+          <End Role="Policy_Master" Type="Self.Policy_Master" Multiplicity="1" />
+          <End Role="Proposal_Master" Type="Self.Proposal_Master" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Policy_Master">
+              <PropertyRef Name="PolicyNo" />
+            </Principal>
+            <Dependent Role="Proposal_Master">
+              <PropertyRef Name="PolicyNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Proposal___Polic__5F7E2DAC">
+          <End Role="Policy_Master" Type="Self.Policy_Master" Multiplicity="1" />
+          <End Role="Proposal_Master" Type="Self.Proposal_Master" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Policy_Master">
+              <PropertyRef Name="PolicyNo" />
+            </Principal>
+            <Dependent Role="Proposal_Master">
+              <PropertyRef Name="PolicyNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Yearly_Fi__DocMa__55F4C372">
+          <End Role="Document_Master" Type="Self.Document_Master" Multiplicity="1" />
+          <End Role="Yearly_Finance_Master" Type="Self.Yearly_Finance_Master" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Document_Master">
+              <PropertyRef Name="DocMasterID" />
+            </Principal>
+            <Dependent Role="Yearly_Finance_Master">
+              <PropertyRef Name="DocMasterID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Yearly_Fi__Polic__56E8E7AB">
+          <End Role="Policy_Master" Type="Self.Policy_Master" Multiplicity="1" />
+          <End Role="Yearly_Finance_Master" Type="Self.Yearly_Finance_Master" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Policy_Master">
+              <PropertyRef Name="PolicyNo" />
+            </Principal>
+            <Dependent Role="Yearly_Finance_Master">
+              <PropertyRef Name="PolicyNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="InsuranceBPaaSModelStoreContainer">
+          <EntitySet Name="CaseSummary" EntityType="Self.CaseSummary" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="DocType_Master" EntityType="Self.DocType_Master" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Document_Master" EntityType="Self.Document_Master" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="KYC_Doc_Master" EntityType="Self.KYC_Doc_Master" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="IncomeAllowableFactors" EntityType="Self.IncomeAllowableFactors" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="KYC_Verify_Master" EntityType="Self.KYC_Verify_Master" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Med_Report_Details" EntityType="Self.Med_Report_Details" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Med_Report_Master" EntityType="Self.Med_Report_Master" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Policy_Master" EntityType="Self.Policy_Master" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Proposal_Master" EntityType="Self.Proposal_Master" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Type_Master" EntityType="Self.Type_Master" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Monthly_Finance_Master" EntityType="Self.Monthly_Finance_Master" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [Monthly_Finance_Master].[MonthlyFinance_Id] AS [MonthlyFinance_Id], 
+    [Monthly_Finance_Master].[PolicyNo] AS [PolicyNo], 
+    [Monthly_Finance_Master].[DocMasterID] AS [DocMasterID], 
+    [Monthly_Finance_Master].[SalaryAmount] AS [SalaryAmount], 
+    [Monthly_Finance_Master].[CrifIncome] AS [CrifIncome], 
+    [Monthly_Finance_Master].[CIBILScore] AS [CIBILScore], 
+    [Monthly_Finance_Master].[Month] AS [Month], 
+    [Monthly_Finance_Master].[Year] AS [Year], 
+    [Monthly_Finance_Master].[CreatedDate] AS [CreatedDate], 
+    [Monthly_Finance_Master].[CreatedBy] AS [CreatedBy], 
+    [Monthly_Finance_Master].[ModifiedDate] AS [ModifiedDate], 
+    [Monthly_Finance_Master].[ModifiedBy] AS [ModifiedBy]
+    FROM [dbo].[Monthly_Finance_Master] AS [Monthly_Finance_Master]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="Yearly_Finance_Master" EntityType="Self.Yearly_Finance_Master" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [Yearly_Finance_Master].[YearlyFinance_Id] AS [YearlyFinance_Id], 
+    [Yearly_Finance_Master].[PolicyNo] AS [PolicyNo], 
+    [Yearly_Finance_Master].[DocMasterID] AS [DocMasterID], 
+    [Yearly_Finance_Master].[coi] AS [coi], 
+    [Yearly_Finance_Master].[Gross_AY] AS [Gross_AY], 
+    [Yearly_Finance_Master].[Form16_AY] AS [Form16_AY], 
+    [Yearly_Finance_Master].[YearFrom] AS [YearFrom], 
+    [Yearly_Finance_Master].[YearTo] AS [YearTo], 
+    [Yearly_Finance_Master].[CreatedDate] AS [CreatedDate], 
+    [Yearly_Finance_Master].[CreatedBy] AS [CreatedBy], 
+    [Yearly_Finance_Master].[ModifiedDate] AS [ModifiedDate], 
+    [Yearly_Finance_Master].[ModifiedBy] AS [ModifiedBy], 
+    [Yearly_Finance_Master].[DateRange] AS [DateRange]
+    FROM [dbo].[Yearly_Finance_Master] AS [Yearly_Finance_Master]</DefiningQuery>
+          </EntitySet>
           <AssociationSet Name="FK__Document___Polic__412EB0B6" Association="Self.FK__Document___Polic__412EB0B6">
             <End Role="Policy_Master" EntitySet="Policy_Master" />
             <End Role="Document_Master" EntitySet="Document_Master" />
           </AssociationSet>
-          <AssociationSet Name="FK__KYC_Doc_M__Polic__4222D4EF" Association="Self.FK__KYC_Doc_M__Polic__4222D4EF">
+          <AssociationSet Name="FK__KYC_Verif__DocMa__43D61337" Association="Self.FK__KYC_Verif__DocMa__43D61337">
+            <End Role="Document_Master" EntitySet="Document_Master" />
+            <End Role="KYC_Verify_Master" EntitySet="KYC_Verify_Master" />
+          </AssociationSet>
+          <AssociationSet Name="FK__KYC_Verif__Polic__44CA3770" Association="Self.FK__KYC_Verif__Polic__44CA3770">
             <End Role="Policy_Master" EntitySet="Policy_Master" />
-            <End Role="KYC_Doc_Master" EntitySet="KYC_Doc_Master" />
+            <End Role="KYC_Verify_Master" EntitySet="KYC_Verify_Master" />
           </AssociationSet>
-          <AssociationSet Name="FK__Med_Repor__Repor__4F7CD00D" Association="Self.FK__Med_Repor__Repor__4F7CD00D">
+          <AssociationSet Name="FK__Med_Repor__DocMa__18EBB532" Association="Self.FK__Med_Repor__DocMa__18EBB532">
+            <End Role="Document_Master" EntitySet="Document_Master" />
+            <End Role="Med_Report_Master" EntitySet="Med_Report_Master" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Med_Repor__Repor__1BC821DD" Association="Self.FK__Med_Repor__Repor__1BC821DD">
             <End Role="Med_Report_Master" EntitySet="Med_Report_Master" />
             <End Role="Med_Report_Details" EntitySet="Med_Report_Details" />
           </AssociationSet>
-          <AssociationSet Name="FK__Med_Repor__Repor__5070F446" Association="Self.FK__Med_Repor__Repor__5070F446">
-            <End Role="Med_Report_Master" EntitySet="Med_Report_Master" />
-            <End Role="Med_Report_Details" EntitySet="Med_Report_Details" />
+          <AssociationSet Name="FK__Monthly_F__DocMa__531856C7" Association="Self.FK__Monthly_F__DocMa__531856C7">
+            <End Role="Document_Master" EntitySet="Document_Master" />
+            <End Role="Monthly_Finance_Master" EntitySet="Monthly_Finance_Master" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Monthly_F__Polic__540C7B00" Association="Self.FK__Monthly_F__Polic__540C7B00">
+            <End Role="Policy_Master" EntitySet="Policy_Master" />
+            <End Role="Monthly_Finance_Master" EntitySet="Monthly_Finance_Master" />
           </AssociationSet>
           <AssociationSet Name="FK__Policy_Ma__Polic__45F365D3" Association="Self.FK__Policy_Ma__Polic__45F365D3">
             <End Role="Type_Master" EntitySet="Type_Master" />
             <End Role="Policy_Master" EntitySet="Policy_Master" />
           </AssociationSet>
+          <AssociationSet Name="FK__Proposal___DocMa__5BAD9CC8" Association="Self.FK__Proposal___DocMa__5BAD9CC8">
+            <End Role="Document_Master" EntitySet="Document_Master" />
+            <End Role="Proposal_Master" EntitySet="Proposal_Master" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Proposal___DocMa__5E8A0973" Association="Self.FK__Proposal___DocMa__5E8A0973">
+            <End Role="Document_Master" EntitySet="Document_Master" />
+            <End Role="Proposal_Master" EntitySet="Proposal_Master" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Proposal___Polic__5CA1C101" Association="Self.FK__Proposal___Polic__5CA1C101">
+            <End Role="Policy_Master" EntitySet="Policy_Master" />
+            <End Role="Proposal_Master" EntitySet="Proposal_Master" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Proposal___Polic__5F7E2DAC" Association="Self.FK__Proposal___Polic__5F7E2DAC">
+            <End Role="Policy_Master" EntitySet="Policy_Master" />
+            <End Role="Proposal_Master" EntitySet="Proposal_Master" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Yearly_Fi__DocMa__55F4C372" Association="Self.FK__Yearly_Fi__DocMa__55F4C372">
+            <End Role="Document_Master" EntitySet="Document_Master" />
+            <End Role="Yearly_Finance_Master" EntitySet="Yearly_Finance_Master" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Yearly_Fi__Polic__56E8E7AB" Association="Self.FK__Yearly_Fi__Polic__56E8E7AB">
+            <End Role="Policy_Master" EntitySet="Policy_Master" />
+            <End Role="Yearly_Finance_Master" EntitySet="Yearly_Finance_Master" />
+          </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="InsuranceBPaaSModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -199,59 +544,12 @@
           <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
           <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Policy_Master" Relationship="Self.FK__Document___Polic__412EB0B6" FromRole="Document_Master" ToRole="Policy_Master" />
-        </EntityType>
-        <EntityType Name="KYC_Doc_Master">
-          <Key>
-            <PropertyRef Name="DocID" />
-          </Key>
-          <Property Name="DocID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="PolicyNo" Type="Int32" Nullable="false" />
-          <Property Name="DocType" Type="Int32" Nullable="false" />
-          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="IDNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="Address" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Name="DOB" Type="DateTime" Precision="3" />
-          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
-          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
-          <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="Policy_Master" Relationship="Self.FK__KYC_Doc_M__Polic__4222D4EF" FromRole="KYC_Doc_Master" ToRole="Policy_Master" />
-        </EntityType>
-        <EntityType Name="Med_Report_Details">
-          <Key>
-            <PropertyRef Name="ReportDetailsID" />
-          </Key>
-          <Property Name="ReportDetailsID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ReportID" Type="Int32" Nullable="false" />
-          <Property Name="TestName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="NumericTestValue" Type="Decimal" Precision="10" Scale="2" />
-          <Property Name="RangeFrom" Type="Decimal" Precision="10" Scale="2" />
-          <Property Name="RangeTill" Type="Decimal" Precision="10" Scale="2" />
-          <Property Name="HealthStatus" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
-          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
-          <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="StringTestValue" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="Med_Report_Master" Relationship="Self.FK__Med_Repor__Repor__4F7CD00D" FromRole="Med_Report_Details" ToRole="Med_Report_Master" />
-          <NavigationProperty Name="Med_Report_Master1" Relationship="Self.FK__Med_Repor__Repor__5070F446" FromRole="Med_Report_Details" ToRole="Med_Report_Master" />
-        </EntityType>
-        <EntityType Name="Med_Report_Master">
-          <Key>
-            <PropertyRef Name="ReportID" />
-          </Key>
-          <Property Name="ReportID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="PolicyNo" Type="Int32" Nullable="false" />
-          <Property Name="ReportType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="ReportName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="ReportDate" Type="DateTime" Precision="3" />
-          <Property Name="Age" Type="Int32" />
-          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
-          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
-          <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="Med_Report_Details" Relationship="Self.FK__Med_Repor__Repor__4F7CD00D" FromRole="Med_Report_Master" ToRole="Med_Report_Details" />
-          <NavigationProperty Name="Med_Report_Details1" Relationship="Self.FK__Med_Repor__Repor__5070F446" FromRole="Med_Report_Master" ToRole="Med_Report_Details" />
+          <NavigationProperty Name="Med_Report_Master" Relationship="InsuranceBPaaSModel.FK__Med_Repor__DocMa__18EBB532" FromRole="Document_Master" ToRole="Med_Report_Master" />
+          <NavigationProperty Name="KYC_Verify_Master" Relationship="InsuranceBPaaSModel.FK__KYC_Verif__DocMa__43D61337" FromRole="Document_Master" ToRole="KYC_Verify_Master" />
+          <NavigationProperty Name="Monthly_Finance_Master" Relationship="InsuranceBPaaSModel.FK__Monthly_F__DocMa__531856C7" FromRole="Document_Master" ToRole="Monthly_Finance_Master" />
+          <NavigationProperty Name="Yearly_Finance_Master" Relationship="InsuranceBPaaSModel.FK__Yearly_Fi__DocMa__55F4C372" FromRole="Document_Master" ToRole="Yearly_Finance_Master" />
+          <NavigationProperty Name="Proposal_Master" Relationship="InsuranceBPaaSModel.FK__Proposal___DocMa__5BAD9CC8" FromRole="Document_Master" ToRole="Proposal_Master" />
+          <NavigationProperty Name="Proposal_Master1" Relationship="InsuranceBPaaSModel.FK__Proposal___DocMa__5E8A0973" FromRole="Document_Master" ToRole="Proposal_Master" />
         </EntityType>
         <EntityType Name="Policy_Master">
           <Key>
@@ -264,8 +562,12 @@
           <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
           <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Document_Master" Relationship="Self.FK__Document___Polic__412EB0B6" FromRole="Policy_Master" ToRole="Document_Master" />
-          <NavigationProperty Name="KYC_Doc_Master" Relationship="Self.FK__KYC_Doc_M__Polic__4222D4EF" FromRole="Policy_Master" ToRole="KYC_Doc_Master" />
           <NavigationProperty Name="Type_Master" Relationship="Self.FK__Policy_Ma__Polic__45F365D3" FromRole="Policy_Master" ToRole="Type_Master" />
+          <NavigationProperty Name="KYC_Verify_Master" Relationship="InsuranceBPaaSModel.FK__KYC_Verif__Polic__44CA3770" FromRole="Policy_Master" ToRole="KYC_Verify_Master" />
+          <NavigationProperty Name="Monthly_Finance_Master" Relationship="InsuranceBPaaSModel.FK__Monthly_F__Polic__540C7B00" FromRole="Policy_Master" ToRole="Monthly_Finance_Master" />
+          <NavigationProperty Name="Yearly_Finance_Master" Relationship="InsuranceBPaaSModel.FK__Yearly_Fi__Polic__56E8E7AB" FromRole="Policy_Master" ToRole="Yearly_Finance_Master" />
+          <NavigationProperty Name="Proposal_Master" Relationship="InsuranceBPaaSModel.FK__Proposal___Polic__5CA1C101" FromRole="Policy_Master" ToRole="Proposal_Master" />
+          <NavigationProperty Name="Proposal_Master1" Relationship="InsuranceBPaaSModel.FK__Proposal___Polic__5F7E2DAC" FromRole="Policy_Master" ToRole="Proposal_Master" />
         </EntityType>
         <EntityType Name="Type_Master">
           <Key>
@@ -288,42 +590,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__KYC_Doc_M__Polic__4222D4EF">
-          <End Role="Policy_Master" Type="Self.Policy_Master" Multiplicity="1" />
-          <End Role="KYC_Doc_Master" Type="Self.KYC_Doc_Master" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Policy_Master">
-              <PropertyRef Name="PolicyNo" />
-            </Principal>
-            <Dependent Role="KYC_Doc_Master">
-              <PropertyRef Name="PolicyNo" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK__Med_Repor__Repor__4F7CD00D">
-          <End Role="Med_Report_Master" Type="Self.Med_Report_Master" Multiplicity="1" />
-          <End Role="Med_Report_Details" Type="Self.Med_Report_Details" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Med_Report_Master">
-              <PropertyRef Name="ReportID" />
-            </Principal>
-            <Dependent Role="Med_Report_Details">
-              <PropertyRef Name="ReportID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK__Med_Repor__Repor__5070F446">
-          <End Role="Med_Report_Master" Type="Self.Med_Report_Master" Multiplicity="1" />
-          <End Role="Med_Report_Details" Type="Self.Med_Report_Details" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Med_Report_Master">
-              <PropertyRef Name="ReportID" />
-            </Principal>
-            <Dependent Role="Med_Report_Details">
-              <PropertyRef Name="ReportID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK__Policy_Ma__Polic__45F365D3">
           <End Role="Type_Master" Type="Self.Type_Master" Multiplicity="0..1" />
           <End Role="Policy_Master" Type="Self.Policy_Master" Multiplicity="*" />
@@ -338,32 +604,440 @@
         </Association>
         <EntityContainer Name="InsuranceBPaaSEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Document_Master" EntityType="Self.Document_Master" />
-          <EntitySet Name="KYC_Doc_Master" EntityType="Self.KYC_Doc_Master" />
-          <EntitySet Name="Med_Report_Details" EntityType="Self.Med_Report_Details" />
-          <EntitySet Name="Med_Report_Master" EntityType="Self.Med_Report_Master" />
           <EntitySet Name="Policy_Master" EntityType="Self.Policy_Master" />
           <EntitySet Name="Type_Master" EntityType="Self.Type_Master" />
           <AssociationSet Name="FK__Document___Polic__412EB0B6" Association="Self.FK__Document___Polic__412EB0B6">
             <End Role="Policy_Master" EntitySet="Policy_Master" />
             <End Role="Document_Master" EntitySet="Document_Master" />
           </AssociationSet>
-          <AssociationSet Name="FK__KYC_Doc_M__Polic__4222D4EF" Association="Self.FK__KYC_Doc_M__Polic__4222D4EF">
-            <End Role="Policy_Master" EntitySet="Policy_Master" />
-            <End Role="KYC_Doc_Master" EntitySet="KYC_Doc_Master" />
-          </AssociationSet>
-          <AssociationSet Name="FK__Med_Repor__Repor__4F7CD00D" Association="Self.FK__Med_Repor__Repor__4F7CD00D">
-            <End Role="Med_Report_Master" EntitySet="Med_Report_Master" />
-            <End Role="Med_Report_Details" EntitySet="Med_Report_Details" />
-          </AssociationSet>
-          <AssociationSet Name="FK__Med_Repor__Repor__5070F446" Association="Self.FK__Med_Repor__Repor__5070F446">
-            <End Role="Med_Report_Master" EntitySet="Med_Report_Master" />
-            <End Role="Med_Report_Details" EntitySet="Med_Report_Details" />
-          </AssociationSet>
           <AssociationSet Name="FK__Policy_Ma__Polic__45F365D3" Association="Self.FK__Policy_Ma__Polic__45F365D3">
             <End Role="Type_Master" EntitySet="Type_Master" />
             <End Role="Policy_Master" EntitySet="Policy_Master" />
           </AssociationSet>
+          <EntitySet Name="DocType_Master" EntityType="InsuranceBPaaSModel.DocType_Master" />
+          <EntitySet Name="Med_Report_Master" EntityType="InsuranceBPaaSModel.Med_Report_Master" />
+          <AssociationSet Name="FK__Med_Repor__DocMa__18EBB532" Association="InsuranceBPaaSModel.FK__Med_Repor__DocMa__18EBB532">
+            <End Role="Document_Master" EntitySet="Document_Master" />
+            <End Role="Med_Report_Master" EntitySet="Med_Report_Master" />
+          </AssociationSet>
+          <EntitySet Name="KYC_Verify_Master" EntityType="InsuranceBPaaSModel.KYC_Verify_Master" />
+          <AssociationSet Name="FK__KYC_Verif__DocMa__43D61337" Association="InsuranceBPaaSModel.FK__KYC_Verif__DocMa__43D61337">
+            <End Role="Document_Master" EntitySet="Document_Master" />
+            <End Role="KYC_Verify_Master" EntitySet="KYC_Verify_Master" />
+          </AssociationSet>
+          <AssociationSet Name="FK__KYC_Verif__Polic__44CA3770" Association="InsuranceBPaaSModel.FK__KYC_Verif__Polic__44CA3770">
+            <End Role="Policy_Master" EntitySet="Policy_Master" />
+            <End Role="KYC_Verify_Master" EntitySet="KYC_Verify_Master" />
+          </AssociationSet>
+          <EntitySet Name="Med_Report_Details" EntityType="InsuranceBPaaSModel.Med_Report_Details" />
+          <AssociationSet Name="FK__Med_Repor__Repor__1BC821DD" Association="InsuranceBPaaSModel.FK__Med_Repor__Repor__1BC821DD">
+            <End Role="Med_Report_Master" EntitySet="Med_Report_Master" />
+            <End Role="Med_Report_Details" EntitySet="Med_Report_Details" />
+          </AssociationSet>
+          <EntitySet Name="CaseSummaries" EntityType="InsuranceBPaaSModel.CaseSummary" />
+          <EntitySet Name="IncomeAllowableFactors" EntityType="InsuranceBPaaSModel.IncomeAllowableFactor" />
+          <EntitySet Name="Monthly_Finance_Master" EntityType="InsuranceBPaaSModel.Monthly_Finance_Master" />
+          <EntitySet Name="Yearly_Finance_Master" EntityType="InsuranceBPaaSModel.Yearly_Finance_Master" />
+          <AssociationSet Name="FK__Monthly_F__DocMa__531856C7" Association="InsuranceBPaaSModel.FK__Monthly_F__DocMa__531856C7">
+            <End Role="Document_Master" EntitySet="Document_Master" />
+            <End Role="Monthly_Finance_Master" EntitySet="Monthly_Finance_Master" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Yearly_Fi__DocMa__55F4C372" Association="InsuranceBPaaSModel.FK__Yearly_Fi__DocMa__55F4C372">
+            <End Role="Document_Master" EntitySet="Document_Master" />
+            <End Role="Yearly_Finance_Master" EntitySet="Yearly_Finance_Master" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Monthly_F__Polic__540C7B00" Association="InsuranceBPaaSModel.FK__Monthly_F__Polic__540C7B00">
+            <End Role="Policy_Master" EntitySet="Policy_Master" />
+            <End Role="Monthly_Finance_Master" EntitySet="Monthly_Finance_Master" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Yearly_Fi__Polic__56E8E7AB" Association="InsuranceBPaaSModel.FK__Yearly_Fi__Polic__56E8E7AB">
+            <End Role="Policy_Master" EntitySet="Policy_Master" />
+            <End Role="Yearly_Finance_Master" EntitySet="Yearly_Finance_Master" />
+          </AssociationSet>
+          <EntitySet Name="Proposal_Master" EntityType="InsuranceBPaaSModel.Proposal_Master" />
+          <AssociationSet Name="FK__Proposal___DocMa__5BAD9CC8" Association="InsuranceBPaaSModel.FK__Proposal___DocMa__5BAD9CC8">
+            <End Role="Document_Master" EntitySet="Document_Master" />
+            <End Role="Proposal_Master" EntitySet="Proposal_Master" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Proposal___DocMa__5E8A0973" Association="InsuranceBPaaSModel.FK__Proposal___DocMa__5E8A0973">
+            <End Role="Document_Master" EntitySet="Document_Master" />
+            <End Role="Proposal_Master" EntitySet="Proposal_Master" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Proposal___Polic__5CA1C101" Association="InsuranceBPaaSModel.FK__Proposal___Polic__5CA1C101">
+            <End Role="Policy_Master" EntitySet="Policy_Master" />
+            <End Role="Proposal_Master" EntitySet="Proposal_Master" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Proposal___Polic__5F7E2DAC" Association="InsuranceBPaaSModel.FK__Proposal___Polic__5F7E2DAC">
+            <End Role="Policy_Master" EntitySet="Policy_Master" />
+            <End Role="Proposal_Master" EntitySet="Proposal_Master" />
+          </AssociationSet>
         </EntityContainer>
+        <EntityType Name="DocType_Master">
+          <Key>
+            <PropertyRef Name="DocTypeId" />
+          </Key>
+          <Property Name="DocTypeId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DocType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="FileNames" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="Med_Report_Master">
+          <Key>
+            <PropertyRef Name="ReportID" />
+          </Key>
+          <Property Name="ReportID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PolicyNo" Type="Int32" Nullable="false" />
+          <Property Name="DocMasterID" Type="Int32" Nullable="false" />
+          <Property Name="ReportType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ReportName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ReportDate" Type="DateTime" Precision="3" />
+          <Property Name="Age" Type="Int32" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Document_Master" Relationship="InsuranceBPaaSModel.FK__Med_Repor__DocMa__18EBB532" FromRole="Med_Report_Master" ToRole="Document_Master" />
+          <NavigationProperty Name="Med_Report_Details" Relationship="InsuranceBPaaSModel.FK__Med_Repor__Repor__1BC821DD" FromRole="Med_Report_Master" ToRole="Med_Report_Details" />
+        </EntityType>
+        <Association Name="FK__Med_Repor__DocMa__18EBB532">
+          <End Type="InsuranceBPaaSModel.Document_Master" Role="Document_Master" Multiplicity="1" />
+          <End Type="InsuranceBPaaSModel.Med_Report_Master" Role="Med_Report_Master" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Document_Master">
+              <PropertyRef Name="DocMasterID" />
+            </Principal>
+            <Dependent Role="Med_Report_Master">
+              <PropertyRef Name="DocMasterID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="KYC_Verify_Master">
+          <Key>
+            <PropertyRef Name="DocID" />
+          </Key>
+          <Property Name="DocID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PolicyNo" Type="Int32" Nullable="false" />
+          <Property Name="DocMasterID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="Int32" />
+          <Property Name="IDNumber" Type="Int32" />
+          <Property Name="City" Type="Int32" />
+          <Property Name="Pincode" Type="Int32" />
+          <Property Name="DOB" Type="Int32" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Document_Master" Relationship="InsuranceBPaaSModel.FK__KYC_Verif__DocMa__43D61337" FromRole="KYC_Verify_Master" ToRole="Document_Master" />
+          <NavigationProperty Name="Policy_Master" Relationship="InsuranceBPaaSModel.FK__KYC_Verif__Polic__44CA3770" FromRole="KYC_Verify_Master" ToRole="Policy_Master" />
+        </EntityType>
+        <Association Name="FK__KYC_Verif__DocMa__43D61337">
+          <End Type="InsuranceBPaaSModel.Document_Master" Role="Document_Master" Multiplicity="1" />
+          <End Type="InsuranceBPaaSModel.KYC_Verify_Master" Role="KYC_Verify_Master" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Document_Master">
+              <PropertyRef Name="DocMasterID" />
+            </Principal>
+            <Dependent Role="KYC_Verify_Master">
+              <PropertyRef Name="DocMasterID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__KYC_Verif__Polic__44CA3770">
+          <End Type="InsuranceBPaaSModel.Policy_Master" Role="Policy_Master" Multiplicity="1" />
+          <End Type="InsuranceBPaaSModel.KYC_Verify_Master" Role="KYC_Verify_Master" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Policy_Master">
+              <PropertyRef Name="PolicyNo" />
+            </Principal>
+            <Dependent Role="KYC_Verify_Master">
+              <PropertyRef Name="PolicyNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Med_Report_Details">
+          <Key>
+            <PropertyRef Name="ReportDetailsID" />
+          </Key>
+          <Property Name="ReportDetailsID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ReportID" Type="Int32" Nullable="false" />
+          <Property Name="TestName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="NumericTestValue" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="RangeFrom" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="RangeTill" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="HealthStatus" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="StringTestValue" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Opinion" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Med_Report_Master" Relationship="InsuranceBPaaSModel.FK__Med_Repor__Repor__1BC821DD" FromRole="Med_Report_Details" ToRole="Med_Report_Master" />
+        </EntityType>
+        <Association Name="FK__Med_Repor__Repor__1BC821DD">
+          <End Type="InsuranceBPaaSModel.Med_Report_Master" Role="Med_Report_Master" Multiplicity="1" />
+          <End Type="InsuranceBPaaSModel.Med_Report_Details" Role="Med_Report_Details" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Med_Report_Master">
+              <PropertyRef Name="ReportID" />
+            </Principal>
+            <Dependent Role="Med_Report_Details">
+              <PropertyRef Name="ReportID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="CaseSummary">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PolicyNo" Type="Int32" Nullable="false" />
+          <Property Name="CustomerName" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="Gender" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="Ageaspersystem" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="Education" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="KYC" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="IDProof" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="AddressProof" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="Photo" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="EnterPincode" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="City" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="VSMCity" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="Occupation" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="MedSumAssured" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="FinancialSumAssured" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="PreviousPolicyMLI" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="PreviousPolicyMLISumAssured" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="PreviousPolicyOther" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="PreviousPolicyOtherSumAssured" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="DeclaredIncome" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="CrifScore" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="CrifIncome" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="AppliedSumAssured" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="Financialdocument" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="TeleMERReport" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="MedicalRequired" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="MedicalReceived" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="MedicalReportDate" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="Height" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="Weight" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="BMI" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="Smoker" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="UrineCotininetest" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="ECGReport" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="Bloodprofile_CBCFinding" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="Medicalrecommendation" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="Financialrecommendation" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="Finalrecommendation" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="FinalDecision" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="Islock" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="lockby" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="QCby" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="QCbyon" Type="DateTime" Precision="3" />
+          <Property Name="status" Type="Int32" />
+          <Property Name="lastmonthsal" Type="Int32" />
+          <Property Name="Secondlastmonthsal" Type="Int32" />
+          <Property Name="Thirdlastmonthsal" Type="Int32" />
+          <Property Name="CustomerEligibilityOnSalary" Type="Int32" />
+          <Property Name="LastYrGross_AY" Type="Int32" />
+          <Property Name="SecondLastYrGross_AY" Type="Int32" />
+          <Property Name="ThirdLastYrGross_AY" Type="Int32" />
+          <Property Name="CustomerEligibilityOnITR" Type="Int32" />
+          <Property Name="LastYrForm16" Type="Int32" />
+          <Property Name="SecondLastYrForm16" Type="Int32" />
+          <Property Name="ThirdLastYrForm16" Type="Int32" />
+          <Property Name="CustomerEligibilityOnForm16" Type="Int32" />
+          <Property Name="BankStmt_LastMonthSal" Type="Int32" />
+          <Property Name="BankStmt_SecLastMonthSal" Type="Int32" />
+          <Property Name="BankStmt_ThirdLastMonthSal" Type="Int32" />
+          <Property Name="CustomerEligibilityOnBankStmt" Type="Int32" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="IncomeAllowableFactor">
+          <Key>
+            <PropertyRef Name="IAF_Id" />
+          </Key>
+          <Property Name="IAF_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AgeFrom" Type="Int32" />
+          <Property Name="AgeTill" Type="Int32" />
+          <Property Name="MultiplierFactor" Type="Int32" />
+          <Property Name="Income_Above_5L" Type="Int32" />
+        </EntityType>
+        <EntityType Name="Monthly_Finance_Master">
+          <Key>
+            <PropertyRef Name="MonthlyFinance_Id" />
+            <PropertyRef Name="PolicyNo" />
+            <PropertyRef Name="DocMasterID" />
+          </Key>
+          <Property Name="MonthlyFinance_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PolicyNo" Type="Int32" Nullable="false" />
+          <Property Name="DocMasterID" Type="Int32" Nullable="false" />
+          <Property Name="SalaryAmount" Type="Int32" />
+          <Property Name="CrifIncome" Type="Int32" />
+          <Property Name="CIBILScore" Type="Int32" />
+          <Property Name="Month" Type="Int32" />
+          <Property Name="Year" Type="Int32" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Document_Master" Relationship="InsuranceBPaaSModel.FK__Monthly_F__DocMa__531856C7" FromRole="Monthly_Finance_Master" ToRole="Document_Master" />
+          <NavigationProperty Name="Policy_Master" Relationship="InsuranceBPaaSModel.FK__Monthly_F__Polic__540C7B00" FromRole="Monthly_Finance_Master" ToRole="Policy_Master" />
+        </EntityType>
+        <EntityType Name="Yearly_Finance_Master">
+          <Key>
+            <PropertyRef Name="YearlyFinance_Id" />
+            <PropertyRef Name="PolicyNo" />
+            <PropertyRef Name="DocMasterID" />
+          </Key>
+          <Property Name="YearlyFinance_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PolicyNo" Type="Int32" Nullable="false" />
+          <Property Name="DocMasterID" Type="Int32" Nullable="false" />
+          <Property Name="coi" Type="Int32" />
+          <Property Name="Gross_AY" Type="Int32" />
+          <Property Name="Form16_AY" Type="Int32" />
+          <Property Name="YearFrom" Type="Int32" />
+          <Property Name="YearTo" Type="Int32" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DateRange" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Document_Master" Relationship="InsuranceBPaaSModel.FK__Yearly_Fi__DocMa__55F4C372" FromRole="Yearly_Finance_Master" ToRole="Document_Master" />
+          <NavigationProperty Name="Policy_Master" Relationship="InsuranceBPaaSModel.FK__Yearly_Fi__Polic__56E8E7AB" FromRole="Yearly_Finance_Master" ToRole="Policy_Master" />
+        </EntityType>
+        <Association Name="FK__Monthly_F__DocMa__531856C7">
+          <End Type="InsuranceBPaaSModel.Document_Master" Role="Document_Master" Multiplicity="1" />
+          <End Type="InsuranceBPaaSModel.Monthly_Finance_Master" Role="Monthly_Finance_Master" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Document_Master">
+              <PropertyRef Name="DocMasterID" />
+            </Principal>
+            <Dependent Role="Monthly_Finance_Master">
+              <PropertyRef Name="DocMasterID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Yearly_Fi__DocMa__55F4C372">
+          <End Type="InsuranceBPaaSModel.Document_Master" Role="Document_Master" Multiplicity="1" />
+          <End Type="InsuranceBPaaSModel.Yearly_Finance_Master" Role="Yearly_Finance_Master" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Document_Master">
+              <PropertyRef Name="DocMasterID" />
+            </Principal>
+            <Dependent Role="Yearly_Finance_Master">
+              <PropertyRef Name="DocMasterID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Monthly_F__Polic__540C7B00">
+          <End Type="InsuranceBPaaSModel.Policy_Master" Role="Policy_Master" Multiplicity="1" />
+          <End Type="InsuranceBPaaSModel.Monthly_Finance_Master" Role="Monthly_Finance_Master" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Policy_Master">
+              <PropertyRef Name="PolicyNo" />
+            </Principal>
+            <Dependent Role="Monthly_Finance_Master">
+              <PropertyRef Name="PolicyNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Yearly_Fi__Polic__56E8E7AB">
+          <End Type="InsuranceBPaaSModel.Policy_Master" Role="Policy_Master" Multiplicity="1" />
+          <End Type="InsuranceBPaaSModel.Yearly_Finance_Master" Role="Yearly_Finance_Master" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Policy_Master">
+              <PropertyRef Name="PolicyNo" />
+            </Principal>
+            <Dependent Role="Yearly_Finance_Master">
+              <PropertyRef Name="PolicyNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Proposal_Master">
+          <Key>
+            <PropertyRef Name="ProposalNo" />
+          </Key>
+          <Property Name="ProposalNo" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PolicyNo" Type="Int32" Nullable="false" />
+          <Property Name="DocMasterID" Type="Int32" Nullable="false" />
+          <Property Name="Title" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="FirstName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="MiddleName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="LastName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DOB" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Education" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Occupation" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Employer" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="AnnualIncome" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="PercentageShare" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="CurrentCity" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CurrentPinCode" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="MobileNo" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="EmailID" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="PermanentCity" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="PermanentPinCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="SumAssured" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="Gender" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="RelationWithProposer" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Document_Master" Relationship="InsuranceBPaaSModel.FK__Proposal___DocMa__5BAD9CC8" FromRole="Proposal_Master" ToRole="Document_Master" />
+          <NavigationProperty Name="Document_Master1" Relationship="InsuranceBPaaSModel.FK__Proposal___DocMa__5E8A0973" FromRole="Proposal_Master" ToRole="Document_Master" />
+          <NavigationProperty Name="Policy_Master" Relationship="InsuranceBPaaSModel.FK__Proposal___Polic__5CA1C101" FromRole="Proposal_Master" ToRole="Policy_Master" />
+          <NavigationProperty Name="Policy_Master1" Relationship="InsuranceBPaaSModel.FK__Proposal___Polic__5F7E2DAC" FromRole="Proposal_Master" ToRole="Policy_Master" />
+        </EntityType>
+        <Association Name="FK__Proposal___DocMa__5BAD9CC8">
+          <End Type="InsuranceBPaaSModel.Document_Master" Role="Document_Master" Multiplicity="1" />
+          <End Type="InsuranceBPaaSModel.Proposal_Master" Role="Proposal_Master" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Document_Master">
+              <PropertyRef Name="DocMasterID" />
+            </Principal>
+            <Dependent Role="Proposal_Master">
+              <PropertyRef Name="DocMasterID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Proposal___DocMa__5E8A0973">
+          <End Type="InsuranceBPaaSModel.Document_Master" Role="Document_Master" Multiplicity="1" />
+          <End Type="InsuranceBPaaSModel.Proposal_Master" Role="Proposal_Master" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Document_Master">
+              <PropertyRef Name="DocMasterID" />
+            </Principal>
+            <Dependent Role="Proposal_Master">
+              <PropertyRef Name="DocMasterID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Proposal___Polic__5CA1C101">
+          <End Type="InsuranceBPaaSModel.Policy_Master" Role="Policy_Master" Multiplicity="1" />
+          <End Type="InsuranceBPaaSModel.Proposal_Master" Role="Proposal_Master" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Policy_Master">
+              <PropertyRef Name="PolicyNo" />
+            </Principal>
+            <Dependent Role="Proposal_Master">
+              <PropertyRef Name="PolicyNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Proposal___Polic__5F7E2DAC">
+          <End Type="InsuranceBPaaSModel.Policy_Master" Role="Policy_Master" Multiplicity="1" />
+          <End Type="InsuranceBPaaSModel.Proposal_Master" Role="Proposal_Master" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Policy_Master">
+              <PropertyRef Name="PolicyNo" />
+            </Principal>
+            <Dependent Role="Proposal_Master">
+              <PropertyRef Name="PolicyNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -381,57 +1055,6 @@
                 <ScalarProperty Name="DocType" ColumnName="DocType" />
                 <ScalarProperty Name="DocExtension" ColumnName="DocExtension" />
                 <ScalarProperty Name="TransID" ColumnName="TransID" />
-                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
-                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
-                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
-                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="KYC_Doc_Master">
-            <EntityTypeMapping TypeName="InsuranceBPaaSModel.KYC_Doc_Master">
-              <MappingFragment StoreEntitySet="KYC_Doc_Master">
-                <ScalarProperty Name="DocID" ColumnName="DocID" />
-                <ScalarProperty Name="PolicyNo" ColumnName="PolicyNo" />
-                <ScalarProperty Name="DocType" ColumnName="DocType" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="IDNumber" ColumnName="IDNumber" />
-                <ScalarProperty Name="Address" ColumnName="Address" />
-                <ScalarProperty Name="DOB" ColumnName="DOB" />
-                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
-                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
-                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
-                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Med_Report_Details">
-            <EntityTypeMapping TypeName="InsuranceBPaaSModel.Med_Report_Details">
-              <MappingFragment StoreEntitySet="Med_Report_Details">
-                <ScalarProperty Name="ReportDetailsID" ColumnName="ReportDetailsID" />
-                <ScalarProperty Name="ReportID" ColumnName="ReportID" />
-                <ScalarProperty Name="TestName" ColumnName="TestName" />
-                <ScalarProperty Name="NumericTestValue" ColumnName="NumericTestValue" />
-                <ScalarProperty Name="RangeFrom" ColumnName="RangeFrom" />
-                <ScalarProperty Name="RangeTill" ColumnName="RangeTill" />
-                <ScalarProperty Name="HealthStatus" ColumnName="HealthStatus" />
-                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
-                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
-                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
-                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
-                <ScalarProperty Name="StringTestValue" ColumnName="StringTestValue" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Med_Report_Master">
-            <EntityTypeMapping TypeName="InsuranceBPaaSModel.Med_Report_Master">
-              <MappingFragment StoreEntitySet="Med_Report_Master">
-                <ScalarProperty Name="ReportID" ColumnName="ReportID" />
-                <ScalarProperty Name="PolicyNo" ColumnName="PolicyNo" />
-                <ScalarProperty Name="ReportType" ColumnName="ReportType" />
-                <ScalarProperty Name="ReportName" ColumnName="ReportName" />
-                <ScalarProperty Name="ReportDate" ColumnName="ReportDate" />
-                <ScalarProperty Name="Age" ColumnName="Age" />
                 <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
                 <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
                 <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
@@ -457,6 +1080,220 @@
                 <ScalarProperty Name="TypeId" ColumnName="TypeId" />
                 <ScalarProperty Name="TypeName" ColumnName="TypeName" />
                 <ScalarProperty Name="TypeCategory" ColumnName="TypeCategory" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DocType_Master">
+            <EntityTypeMapping TypeName="InsuranceBPaaSModel.DocType_Master">
+              <MappingFragment StoreEntitySet="DocType_Master">
+                <ScalarProperty Name="FileNames" ColumnName="FileNames" />
+                <ScalarProperty Name="DocType" ColumnName="DocType" />
+                <ScalarProperty Name="DocTypeId" ColumnName="DocTypeId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Med_Report_Master">
+            <EntityTypeMapping TypeName="InsuranceBPaaSModel.Med_Report_Master">
+              <MappingFragment StoreEntitySet="Med_Report_Master">
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="Age" ColumnName="Age" />
+                <ScalarProperty Name="ReportDate" ColumnName="ReportDate" />
+                <ScalarProperty Name="ReportName" ColumnName="ReportName" />
+                <ScalarProperty Name="ReportType" ColumnName="ReportType" />
+                <ScalarProperty Name="DocMasterID" ColumnName="DocMasterID" />
+                <ScalarProperty Name="PolicyNo" ColumnName="PolicyNo" />
+                <ScalarProperty Name="ReportID" ColumnName="ReportID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="KYC_Verify_Master">
+            <EntityTypeMapping TypeName="InsuranceBPaaSModel.KYC_Verify_Master">
+              <MappingFragment StoreEntitySet="KYC_Verify_Master">
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="DOB" ColumnName="DOB" />
+                <ScalarProperty Name="Pincode" ColumnName="Pincode" />
+                <ScalarProperty Name="City" ColumnName="City" />
+                <ScalarProperty Name="IDNumber" ColumnName="IDNumber" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="DocMasterID" ColumnName="DocMasterID" />
+                <ScalarProperty Name="PolicyNo" ColumnName="PolicyNo" />
+                <ScalarProperty Name="DocID" ColumnName="DocID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Med_Report_Details">
+            <EntityTypeMapping TypeName="InsuranceBPaaSModel.Med_Report_Details">
+              <MappingFragment StoreEntitySet="Med_Report_Details">
+                <ScalarProperty Name="Opinion" ColumnName="Opinion" />
+                <ScalarProperty Name="StringTestValue" ColumnName="StringTestValue" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="HealthStatus" ColumnName="HealthStatus" />
+                <ScalarProperty Name="RangeTill" ColumnName="RangeTill" />
+                <ScalarProperty Name="RangeFrom" ColumnName="RangeFrom" />
+                <ScalarProperty Name="NumericTestValue" ColumnName="NumericTestValue" />
+                <ScalarProperty Name="TestName" ColumnName="TestName" />
+                <ScalarProperty Name="ReportID" ColumnName="ReportID" />
+                <ScalarProperty Name="ReportDetailsID" ColumnName="ReportDetailsID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CaseSummaries">
+            <EntityTypeMapping TypeName="InsuranceBPaaSModel.CaseSummary">
+              <MappingFragment StoreEntitySet="CaseSummary">
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="CustomerEligibilityOnBankStmt" ColumnName="CustomerEligibilityOnBankStmt" />
+                <ScalarProperty Name="BankStmt_ThirdLastMonthSal" ColumnName="BankStmt_ThirdLastMonthSal" />
+                <ScalarProperty Name="BankStmt_SecLastMonthSal" ColumnName="BankStmt_SecLastMonthSal" />
+                <ScalarProperty Name="BankStmt_LastMonthSal" ColumnName="BankStmt_LastMonthSal" />
+                <ScalarProperty Name="CustomerEligibilityOnForm16" ColumnName="CustomerEligibilityOnForm16" />
+                <ScalarProperty Name="ThirdLastYrForm16" ColumnName="ThirdLastYrForm16" />
+                <ScalarProperty Name="SecondLastYrForm16" ColumnName="SecondLastYrForm16" />
+                <ScalarProperty Name="LastYrForm16" ColumnName="LastYrForm16" />
+                <ScalarProperty Name="CustomerEligibilityOnITR" ColumnName="CustomerEligibilityOnITR" />
+                <ScalarProperty Name="ThirdLastYrGross_AY" ColumnName="ThirdLastYrGross_AY" />
+                <ScalarProperty Name="SecondLastYrGross_AY" ColumnName="SecondLastYrGross_AY" />
+                <ScalarProperty Name="LastYrGross_AY" ColumnName="LastYrGross_AY" />
+                <ScalarProperty Name="CustomerEligibilityOnSalary" ColumnName="CustomerEligibilityOnSalary" />
+                <ScalarProperty Name="Thirdlastmonthsal" ColumnName="Thirdlastmonthsal" />
+                <ScalarProperty Name="Secondlastmonthsal" ColumnName="Secondlastmonthsal" />
+                <ScalarProperty Name="lastmonthsal" ColumnName="lastmonthsal" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="QCbyon" ColumnName="QCbyon" />
+                <ScalarProperty Name="QCby" ColumnName="QCby" />
+                <ScalarProperty Name="lockby" ColumnName="lockby" />
+                <ScalarProperty Name="Islock" ColumnName="Islock" />
+                <ScalarProperty Name="FinalDecision" ColumnName="FinalDecision" />
+                <ScalarProperty Name="Finalrecommendation" ColumnName="Finalrecommendation" />
+                <ScalarProperty Name="Financialrecommendation" ColumnName="Financialrecommendation" />
+                <ScalarProperty Name="Medicalrecommendation" ColumnName="Medicalrecommendation" />
+                <ScalarProperty Name="Bloodprofile_CBCFinding" ColumnName="Bloodprofile_CBCFinding" />
+                <ScalarProperty Name="ECGReport" ColumnName="ECGReport" />
+                <ScalarProperty Name="UrineCotininetest" ColumnName="UrineCotininetest" />
+                <ScalarProperty Name="Smoker" ColumnName="Smoker" />
+                <ScalarProperty Name="BMI" ColumnName="BMI" />
+                <ScalarProperty Name="Weight" ColumnName="Weight" />
+                <ScalarProperty Name="Height" ColumnName="Height" />
+                <ScalarProperty Name="MedicalReportDate" ColumnName="MedicalReportDate" />
+                <ScalarProperty Name="MedicalReceived" ColumnName="MedicalReceived" />
+                <ScalarProperty Name="MedicalRequired" ColumnName="MedicalRequired" />
+                <ScalarProperty Name="TeleMERReport" ColumnName="TeleMERReport" />
+                <ScalarProperty Name="Financialdocument" ColumnName="Financialdocument" />
+                <ScalarProperty Name="AppliedSumAssured" ColumnName="AppliedSumAssured" />
+                <ScalarProperty Name="CrifIncome" ColumnName="CrifIncome" />
+                <ScalarProperty Name="CrifScore" ColumnName="CrifScore" />
+                <ScalarProperty Name="DeclaredIncome" ColumnName="DeclaredIncome" />
+                <ScalarProperty Name="PreviousPolicyOtherSumAssured" ColumnName="PreviousPolicyOtherSumAssured" />
+                <ScalarProperty Name="PreviousPolicyOther" ColumnName="PreviousPolicyOther" />
+                <ScalarProperty Name="PreviousPolicyMLISumAssured" ColumnName="PreviousPolicyMLISumAssured" />
+                <ScalarProperty Name="PreviousPolicyMLI" ColumnName="PreviousPolicyMLI" />
+                <ScalarProperty Name="FinancialSumAssured" ColumnName="FinancialSumAssured" />
+                <ScalarProperty Name="MedSumAssured" ColumnName="MedSumAssured" />
+                <ScalarProperty Name="Occupation" ColumnName="Occupation" />
+                <ScalarProperty Name="VSMCity" ColumnName="VSMCity" />
+                <ScalarProperty Name="City" ColumnName="City" />
+                <ScalarProperty Name="EnterPincode" ColumnName="EnterPincode" />
+                <ScalarProperty Name="Photo" ColumnName="Photo" />
+                <ScalarProperty Name="AddressProof" ColumnName="AddressProof" />
+                <ScalarProperty Name="IDProof" ColumnName="IDProof" />
+                <ScalarProperty Name="KYC" ColumnName="KYC" />
+                <ScalarProperty Name="Education" ColumnName="Education" />
+                <ScalarProperty Name="Ageaspersystem" ColumnName="Ageaspersystem" />
+                <ScalarProperty Name="Gender" ColumnName="Gender" />
+                <ScalarProperty Name="CustomerName" ColumnName="CustomerName" />
+                <ScalarProperty Name="PolicyNo" ColumnName="PolicyNo" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="IncomeAllowableFactors">
+            <EntityTypeMapping TypeName="InsuranceBPaaSModel.IncomeAllowableFactor">
+              <MappingFragment StoreEntitySet="IncomeAllowableFactors">
+                <ScalarProperty Name="Income_Above_5L" ColumnName="Income_Above_5L" />
+                <ScalarProperty Name="MultiplierFactor" ColumnName="MultiplierFactor" />
+                <ScalarProperty Name="AgeTill" ColumnName="AgeTill" />
+                <ScalarProperty Name="AgeFrom" ColumnName="AgeFrom" />
+                <ScalarProperty Name="IAF_Id" ColumnName="IAF_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Monthly_Finance_Master">
+            <EntityTypeMapping TypeName="InsuranceBPaaSModel.Monthly_Finance_Master">
+              <MappingFragment StoreEntitySet="Monthly_Finance_Master">
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="Year" ColumnName="Year" />
+                <ScalarProperty Name="Month" ColumnName="Month" />
+                <ScalarProperty Name="CIBILScore" ColumnName="CIBILScore" />
+                <ScalarProperty Name="CrifIncome" ColumnName="CrifIncome" />
+                <ScalarProperty Name="SalaryAmount" ColumnName="SalaryAmount" />
+                <ScalarProperty Name="DocMasterID" ColumnName="DocMasterID" />
+                <ScalarProperty Name="PolicyNo" ColumnName="PolicyNo" />
+                <ScalarProperty Name="MonthlyFinance_Id" ColumnName="MonthlyFinance_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Yearly_Finance_Master">
+            <EntityTypeMapping TypeName="InsuranceBPaaSModel.Yearly_Finance_Master">
+              <MappingFragment StoreEntitySet="Yearly_Finance_Master">
+                <ScalarProperty Name="DateRange" ColumnName="DateRange" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="YearTo" ColumnName="YearTo" />
+                <ScalarProperty Name="YearFrom" ColumnName="YearFrom" />
+                <ScalarProperty Name="Form16_AY" ColumnName="Form16_AY" />
+                <ScalarProperty Name="Gross_AY" ColumnName="Gross_AY" />
+                <ScalarProperty Name="coi" ColumnName="coi" />
+                <ScalarProperty Name="DocMasterID" ColumnName="DocMasterID" />
+                <ScalarProperty Name="PolicyNo" ColumnName="PolicyNo" />
+                <ScalarProperty Name="YearlyFinance_Id" ColumnName="YearlyFinance_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Proposal_Master">
+            <EntityTypeMapping TypeName="InsuranceBPaaSModel.Proposal_Master">
+              <MappingFragment StoreEntitySet="Proposal_Master">
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="RelationWithProposer" ColumnName="RelationWithProposer" />
+                <ScalarProperty Name="Gender" ColumnName="Gender" />
+                <ScalarProperty Name="SumAssured" ColumnName="SumAssured" />
+                <ScalarProperty Name="PermanentPinCode" ColumnName="PermanentPinCode" />
+                <ScalarProperty Name="PermanentCity" ColumnName="PermanentCity" />
+                <ScalarProperty Name="EmailID" ColumnName="EmailID" />
+                <ScalarProperty Name="MobileNo" ColumnName="MobileNo" />
+                <ScalarProperty Name="CurrentPinCode" ColumnName="CurrentPinCode" />
+                <ScalarProperty Name="CurrentCity" ColumnName="CurrentCity" />
+                <ScalarProperty Name="PercentageShare" ColumnName="PercentageShare" />
+                <ScalarProperty Name="AnnualIncome" ColumnName="AnnualIncome" />
+                <ScalarProperty Name="Employer" ColumnName="Employer" />
+                <ScalarProperty Name="Occupation" ColumnName="Occupation" />
+                <ScalarProperty Name="Education" ColumnName="Education" />
+                <ScalarProperty Name="DOB" ColumnName="DOB" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="MiddleName" ColumnName="MiddleName" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="DocMasterID" ColumnName="DocMasterID" />
+                <ScalarProperty Name="PolicyNo" ColumnName="PolicyNo" />
+                <ScalarProperty Name="ProposalNo" ColumnName="ProposalNo" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

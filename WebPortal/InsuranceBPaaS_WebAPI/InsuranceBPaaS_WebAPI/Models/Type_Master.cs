@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace InsuranceBPaaS_WebAPI.Models
+namespace InsuranceBPaaSWebAPI.Models
 {
     public class Type_Master
     {

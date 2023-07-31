@@ -26,8 +26,14 @@ namespace BPaasInsurance
         public Nullable<System.DateTime> ModifiedDate { get; set; }
         public string ModifiedBy { get; set; }
         public string StringTestValue { get; set; }
-    
+        public string Opinion { get; set; }
+        public Status Status { get; set; }
+
         public virtual Med_Report_Master Med_Report_Master { get; set; }
-        public virtual Med_Report_Master Med_Report_Master1 { get; set; }
+    }
+    public enum Status
+    {
+        Normal = 0,
+        Abnormal = 1
     }
 }

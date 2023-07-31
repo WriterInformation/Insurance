@@ -8,6 +8,9 @@ using System.Data.SqlTypes;
 using System.Text;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Threading.Channels;
+using InsuranceDAL;
+using System.Reflection.Metadata;
+using Microsoft.Data.SqlClient;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -30,14 +33,37 @@ namespace InsuranceBPaaS_WebAPI.Controllers
         {
             return await _context.Policy_Master.ToListAsync();
         }
-        
+
         [HttpGet]
         public async Task<IEnumerable<Med_Report_Details>> GetPolicyReportDetails(int reportId)
         {
             var lst_medReportDetails = await _context.Med_Report_Details.ToListAsync();
             return lst_medReportDetails.Where(x => x.ReportID == reportId);
         }
-        
+        [HttpGet]
+        public async Task<PolicyDetailsViewModel> GetPolicyDetails(int policyNo)
+        {
+            var medReportDetails = _context.Med_Report_Details.Where(x => x.medReportMaster.PolicyNo == policyNo).ToList();
+            var documentMaster = _context.Document_Master.Where(x => x.PolicyNo == policyNo).ToList();
+            var monthlyFinanceMaster = _context.Monthly_Finance_Master.Where(x => x.PolicyNo == policyNo).ToList();
+            var yearlyFinanceMaster = _context.Yearly_Finance_Master.Where(x => x.PolicyNo == policyNo).ToList();
+            var medReportMaster = _context.Med_Report_Master.Where(x => x.PolicyNo == policyNo).ToList();
+            var proposalMaster = _context.Proposal_Master.Where(x => x.PolicyNo == policyNo).First();
+            var kyc_Verify_Master = _context.KYC_Verify_Master.Where(x => x.PolicyNo == policyNo).First();
+
+            PolicyDetailsViewModel policyDetailsViewModel = new PolicyDetailsViewModel
+            {
+                med_Report_Details = medReportDetails,
+                document_Master = documentMaster,
+                monthly_Finance_Master = monthlyFinanceMaster,
+                yearly_Finance_Master = yearlyFinanceMaster,
+                med_Report_Master = medReportMaster,
+                proposal_Master = proposalMaster,
+                kyc_Verify_Master = kyc_Verify_Master
+            };
+            return policyDetailsViewModel;
+        }
+
         [HttpPost]
         public async Task<IEnumerable<Med_Report_Details>> GetBloodReportDetails(Med_Report_Master med_Report_Master)
         {
@@ -45,19 +71,19 @@ namespace InsuranceBPaaS_WebAPI.Controllers
             var reportIds = _context.Med_Report_Master.Where(x => x.PolicyNo == med_Report_Master.PolicyNo && x.ReportType == "Medical").Select(x => x.ReportID).ToList();
             return await GetPolicyReportDetails(reportIds[1]);
         }
-        
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Document_Master>>> GetPendingOCRData()
         {
-            return await _context.Document_Master.Where(x => x.DocStatusCode == 0).ToListAsync();
+            return await _context.Document_Master.Where(x => x.DocStatusCode == 0 && x.DocType != "Others").ToListAsync();
         }
-        
+
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<KYC_Doc_Master>>> GetKYC_Doc_Master()
+        public async Task<ActionResult<IEnumerable<KYC_Verify_Master>>> GetKYC_Verify_Master()
         {
-            return await _context.KYC_Doc_Master.ToListAsync();
+            return await _context.KYC_Verify_Master.ToListAsync();
         }
-        
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Med_Report_Details>>> GetMed_Report_Details()
         {
@@ -188,11 +214,26 @@ namespace InsuranceBPaaS_WebAPI.Controllers
             return NoContent();
         }
         [HttpPost]
-        public IActionResult AddFinancialValues(Finance_Master finance_Master)
+        public IActionResult AddMonthlyFinanceValues(Monthly_Finance_Master monthly_Finance_Master)
         {
-            _context.Finance_Master.Add(finance_Master);
+            _context.Monthly_Finance_Master.Add(monthly_Finance_Master);
             _context.SaveChanges();
-            var entity = _context.Document_Master.FirstOrDefault(e => e.DocMasterID == finance_Master.DocMasterID);
+            var entity = _context.Document_Master.FirstOrDefault(e => e.DocMasterID == monthly_Finance_Master.DocMasterID);
+            if (entity != null)
+            {
+                // Modify the desired property
+                entity.DocStatusCode = 1;
+                // Save the changes to the database
+                _context.SaveChanges();
+            }
+            return NoContent();
+        }
+        [HttpPost]
+        public IActionResult AddYearlyFinanceValues(Yearly_Finance_Master yearly_Finance_Master)
+        {
+            _context.Yearly_Finance_Master.Add(yearly_Finance_Master);
+            _context.SaveChanges();
+            var entity = _context.Document_Master.FirstOrDefault(e => e.DocMasterID == yearly_Finance_Master.DocMasterID);
             if (entity != null)
             {
                 // Modify the desired property
@@ -217,15 +258,77 @@ namespace InsuranceBPaaS_WebAPI.Controllers
             }
             return NoContent();
         }
+
+        [HttpPost]
+        public IActionResult AddkycOCRResult(KYC_Verify_Master kyc_Verify_Master)
+        {
+            _context.KYC_Verify_Master.Add(kyc_Verify_Master);
+            _context.SaveChanges();
+            var entity = _context.Document_Master.FirstOrDefault(e => e.DocMasterID == kyc_Verify_Master.DocMasterID);
+            if (entity != null)
+            {
+                // Modify the desired property
+                entity.DocStatusCode = 1;
+                // Save the changes to the database
+                _context.SaveChanges();
+            }
+            return NoContent();
+        }
+        [HttpPost]
+        public async Task<IActionResult> AddECGReportValues(Med_Report_Details med_Report_Details)
+        {
+            _context.Med_Report_Details.Add(med_Report_Details);
+            _context.SaveChanges();
+            int docID = _context.Med_Report_Master.Where(x => x.ReportID == med_Report_Details.ReportID).First().DocMasterID;
+            var entity = _context.Document_Master.FirstOrDefault(e => e.DocMasterID == docID);
+            if (entity != null)
+            {
+                // Modify the desired property
+                entity.DocStatusCode = 1;
+                // Save the changes to the database
+                _context.SaveChanges();
+            }
+            return NoContent();
+        }
         #endregion
 
         #region Edit
         [HttpPost]
-        public async Task<IActionResult> EditMedicalReportValues(Med_Report_Details med_Report_Details)
+        public async Task<IActionResult> EditMedicalReportValues(List<Med_Report_Details> lst_med_Report_Details)
+        {
+            foreach (var med_Report_Details in lst_med_Report_Details)
+            {
+                med_Report_Details.ModifiedDate = DateTime.Now;
+                med_Report_Details.ModifiedBy = "SYSTEM";
+                if (_context.Med_Report_Details.Select(x => x.ReportDetailsID == med_Report_Details.ReportDetailsID).Count() <= 0)
+                {
+                    return BadRequest();
+                }
+                _context.Entry(med_Report_Details).State = EntityState.Modified;
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_context.Med_Report_Details.Any(e => e.ReportDetailsID == med_Report_Details.ReportDetailsID))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+            return NoContent();
+        }
+        [HttpPost]
+        public async Task<IActionResult> EditECGReportValues(Med_Report_Details med_Report_Details)
         {
             med_Report_Details.ModifiedDate = DateTime.Now;
             med_Report_Details.ModifiedBy = "SYSTEM";
-            if (_context.Med_Report_Details.Where(x => x.ReportID == med_Report_Details.ReportID).Count()<=0)
+            if (_context.Med_Report_Details.Select(x => x.ReportDetailsID == med_Report_Details.ReportDetailsID).Count() <= 0)
             {
                 return BadRequest();
             }
@@ -236,7 +339,7 @@ namespace InsuranceBPaaS_WebAPI.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!_context.Med_Report_Details.Any(e => e.ReportID == med_Report_Details.ReportID))
+                if (!_context.Med_Report_Details.Any(e => e.ReportDetailsID == med_Report_Details.ReportDetailsID))
                 {
                     return NotFound();
                 }
@@ -248,31 +351,38 @@ namespace InsuranceBPaaS_WebAPI.Controllers
             return NoContent();
         }
         [HttpPost]
-        public async Task<IActionResult> EditFinancialValues(Finance_Master finance_Master)
+        public async Task<IActionResult> EditMonthly_FinancialValues(List<Monthly_Finance_Master> lstMonthly_Finance_Master)
         {
-            finance_Master.ModifiedDate = DateTime.Now;
-            finance_Master.ModifiedBy = "SYSTEM";
-            if (_context.Finance_Master.Where(x => x.FinanceMasterId == finance_Master.FinanceMasterId).Count() <= 0)
+            foreach (var monthly_Finance_Master in lstMonthly_Finance_Master)
             {
-                return BadRequest();
-            }
-            _context.Entry(finance_Master).State = EntityState.Modified;
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Finance_Master.Any(e => e.FinanceMasterId == finance_Master.FinanceMasterId))
+                monthly_Finance_Master.ModifiedDate = DateTime.Now;
+                monthly_Finance_Master.ModifiedBy = "SYSTEM";
+                if (_context.Monthly_Finance_Master.Where(x => x.MonthlyFinance_Id == monthly_Finance_Master.MonthlyFinance_Id).Count() <= 0)
                 {
-                    return NotFound();
+                    return BadRequest();
                 }
-                else
+                _context.Entry(monthly_Finance_Master).State = EntityState.Modified;
+                try
                 {
-                    throw;
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_context.Monthly_Finance_Master.Any(e => e.MonthlyFinance_Id == monthly_Finance_Master.MonthlyFinance_Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
             }
+            var param = new SqlParameter("@PolicyNo", lstMonthly_Finance_Master.First().PolicyNo);
+            await _context.Database.ExecuteSqlRawAsync(@"exec InsertCaseSummary @PolicyNo", param);
+
             return NoContent();
+
         }
         [HttpPost]
         public async Task<IActionResult> EditProposalValues(Proposal_Master proposal_Master)
@@ -303,6 +413,30 @@ namespace InsuranceBPaaS_WebAPI.Controllers
         }
         #endregion
 
+        [HttpGet]
+        public async Task<ActionResult<Proposal_Master>> GetProposalDetailsByPolicyNo(int id)
+        {
+            var proposal_Master = _context.Proposal_Master.Where(x => x.PolicyNo == id).First();
+
+            if (proposal_Master == null)
+            {
+                return NotFound();
+            }
+
+            return proposal_Master;
+        }
+
+        [HttpPost]
+        public int GetDocMasterIdForECG(int policyNo)
+        {
+            int docMasterId = 0;
+            var entity = _context.Document_Master.FirstOrDefault(e => e.PolicyNo == policyNo && e.DocumentName.Contains("ECG"));
+            if (entity != null)
+            {
+                docMasterId = entity.DocMasterID;
+            }
+            return docMasterId;
+        }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Policy_Master>> GetVendor(int id)

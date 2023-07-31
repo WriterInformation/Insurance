@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace InsuranceBPaaS_WebAPI.Models
+namespace InsuranceBPaaSWebAPI.Models
 {
     public class Med_Report_Details
     {
@@ -24,5 +24,6 @@ namespace InsuranceBPaaS_WebAPI.Models
         public Nullable<DateTime> ModifiedDate { get; set; }
         public string? ModifiedBy { get; set; }
         public string? StringTestValue { get; set; }
+        public string? Opinion { get; set; }
     }
 }

@@ -1,0 +1,71 @@
+﻿@model List<BPaasInsurance.Med_Report_Details>
+
+
+@using (Html.BeginForm("SaveMedicalReportDetails", "Home", FormMethod.Post))
+{
+    <div id="Header_Blood" class="Blood panel-body border" style="width: 95%; margin: 0 auto; border-radius: 5px; background-color: #2f4f4f;">
+        <table id="example" class="display cell-border" style="width: 90%; margin: 0 auto">
+            <thead class="text-white">
+                <tr>
+
+                    <th>Test Name</th>
+                    <th>Values</th>
+                    <th>Range</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <div id="Body_Blood" class="Blood panel-body border overflow-auto dv_blood_details">
+
+        <table id="example" class="display cell-border" style="width: 90%; margin: 0 auto">
+            <tbody>
+                @for (int i = 0; i < Model.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayName(Model[i].TestName)
+                        </td>
+                        <td>
+                            @{
+                                @Html.HiddenFor(m => m[i].ReportDetailsID)
+                                @Html.HiddenFor(m => m[i].ReportID)
+                                @Html.HiddenFor(m => m[i].TestName)
+                                @Html.HiddenFor(m => m[i].RangeFrom)
+                                @Html.HiddenFor(m => m[i].RangeTill)
+                                @Html.HiddenFor(m => m[i].HealthStatus)
+                                @Html.HiddenFor(m => m[i].CreatedDate)
+                                @Html.HiddenFor(m => m[i].CreatedBy)
+
+
+                                string textBoxClass = Model[i].HealthStatus == "Normal" ? "form-control text-white bg-success" : (Model[i].HealthStatus == "Abnormal") ? "bg-danger text-white form-control" : "form-control";
+                                if (Model[i].StringTestValue == "" || Model[i].StringTestValue == null)
+                                {
+                                    @Html.TextBoxFor(m => m[i].NumericTestValue, Convert.ToString(Model[i].NumericTestValue.Value), new { @style = " width: 150px;text-align: center; ", @class = textBoxClass })
+                                }
+                                else
+                                {
+                                    @Html.TextBox("txtTestValue", Convert.ToString(Model[i].StringTestValue), new { @style = " width: 150px;text-align: center; ", @class = textBoxClass })
+                                }
+                            }
+                        </td>
+                        <td style="text-align:center">
+                            @{
+
+                                if (Model[i].StringTestValue == "" || Model[i].StringTestValue == null)
+                                {
+                                    @(Model[i].RangeFrom + " - " + Model[i].RangeTill)
+                                }
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+    </div>
+    <div class="buttonFooter">
+        <input type="submit" value="Save" class="btn btn-success" style="border-radius: 16px; width:12%;" />
+        <input type="button" class="btn btn-secondary" value="Reset" style="border-radius: 16px; width: 12%;" onclick="@("window.location.href='" + @Url.Action("Index", "Home") + "'");" />
+        <input type="button" class="btn btn-danger" value="Cancel" style="border-radius: 16px; width: 12%;" onclick="@("window.location.href='" + @Url.Action("Index", "Home") + "'");" />
+    </div>
+}

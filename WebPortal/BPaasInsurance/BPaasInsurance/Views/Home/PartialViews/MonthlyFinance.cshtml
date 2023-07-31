@@ -1,0 +1,119 @@
+﻿@model List<BPaasInsurance.Monthly_Finance_Master>
+
+<script>
+    $(document).ready(function () {
+        $('#myForm').submit(function (event) {
+            var formData = $(this).serialize(); // Serialize form data
+            event.preventDefault();
+            swal({
+                title: "Do you want to save it?",
+                text: "Please check Information before Submiting!",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Save",
+                cancelButtonText: "Cancel",
+                closeOnConfirm: false,
+                closeOnCancel: false
+            },
+                function (isConfirm) {
+                    if (isConfirm) {
+
+                        $.ajax({
+                            url: '@Url.Action("SaveFinancialDetails", "Home")', // Replace "My" with your controller name
+                            type: 'POST',
+                            data: formData,
+                            success: function (response) {
+                                // Handle the successful response
+                                sweetAlert("Success!", "Saved Successfully", "success");
+                                $.ajax({
+                                    url: '@Url.Action("ViewPolicyDetails", "Home")', // Replace "My" with your controller name
+                                    type: 'POST',
+                                    data: @Session["PolicyNo"],
+                                    success: function (response) {
+                                        // Handle the successful response
+                                        $('#SavedMsg').show();
+                                        sweetAlert("Success!", "Saved Successfully", "success");
+                                        refreshView();
+                                    },
+                                    error: function (xhr, status, error) {
+                                        // Handle errors
+                                        alert("Error saving form data: " + error);
+                                    }
+                                });
+                            },
+                            error: function (xhr, status, error) {
+                                // Handle errors
+                                alert("Error saving form data: " + error);
+                            }
+                        });
+                    }
+                    else {
+                        swal("Cancelled", "You have Cancelled Form Submission!", "error");
+                    }
+                });
+        });
+    });
+    function refreshView() {
+        $.ajax({
+            url: '@Url.Action("GetUpdatedFinanceData", "Home")',
+            type: 'GET',
+            success: function (response) {
+                // Update the view with the new data
+                $('#dvSalary').html(response);
+            },
+            error: function (xhr, status, error) {
+                // Handle errors
+                alert("Error fetching updated data: " + error);
+            }
+        });
+    }
+</script>
+
+
+@using (Html.BeginForm("SaveFinancialDetails", "Home", FormMethod.Post, new { id = "myForm" }))
+{
+
+<div id="dv_Salary" class="Salary col-md-12 panel-body border overflow-auto dv_financial_details">
+
+
+    <table>
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            <tr>
+                <td>
+
+                    @Html.HiddenFor(m => m[i].MonthlyFinance_Id)
+                    @Html.HiddenFor(m => m[i].PolicyNo)
+                    @Html.HiddenFor(m => m[i].DocMasterID)
+                    @Html.HiddenFor(m => m[i].Month)
+                    @Html.HiddenFor(m => m[i].Year)
+                    @Html.HiddenFor(m => m[i].CreatedDate)
+                    @Html.HiddenFor(m => m[i].CreatedBy)
+
+                    Salary - @(new DateTime(1, (int)Model[i].Month, 1).ToString("MMMM")) @Model[i].Year
+
+                </td>
+                <td>
+                    @Html.TextBoxFor(m => m[i].SalaryAmount, Convert.ToString(Model[i].SalaryAmount.Value), new { @style = "  width: 130px;", @class = "form-control" })
+                </td>
+            </tr>
+
+
+        }
+        @if (ViewBag.caseSummary != null)
+        {
+            <tr>
+                <td> Customer Eligible For Amount(INR) :</td>
+                <td><b>@ViewBag.caseSummary.CustomerEligibilityOnSalary</b></td>
+            </tr>
+        }
+    </table>
+</div>
+
+    <div class="buttonFooter">
+        <input type="submit" value="Save" class="btn btn-success" style="border-radius: 16px; width: 12%;" />
+        <button type="button" class="btn btn-secondary" style="border-radius: 16px; width: 12%;">Reset</button>
+        <input type="button" class="btn btn-secondary" value="Cancel" style="border-radius: 16px; width: 12%;" onclick="@("window.location.href='" + @Url.Action("Index", "Home") + "'");" />
+    </div>
+}

@@ -18,11 +18,11 @@ namespace BPaasInsurance
         public Med_Report_Master()
         {
             this.Med_Report_Details = new HashSet<Med_Report_Details>();
-            this.Med_Report_Details1 = new HashSet<Med_Report_Details>();
         }
     
         public int ReportID { get; set; }
         public int PolicyNo { get; set; }
+        public int DocMasterID { get; set; }
         public string ReportType { get; set; }
         public string ReportName { get; set; }
         public Nullable<System.DateTime> ReportDate { get; set; }
@@ -32,9 +32,8 @@ namespace BPaasInsurance
         public Nullable<System.DateTime> ModifiedDate { get; set; }
         public string ModifiedBy { get; set; }
     
+        public virtual Document_Master Document_Master { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Med_Report_Details> Med_Report_Details { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Med_Report_Details> Med_Report_Details1 { get; set; }
     }
 }

@@ -4,18 +4,33 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="93ac3a8f9f45416c93ef97c6c0fb331a" Name="Diagram1">
+      <Diagram DiagramId="93ac3a8f9f45416c93ef97c6c0fb331a" Name="Diagram1" ZoomLevel="77">
         <EntityTypeShape EntityType="InsuranceBPaaSModel.Document_Master" Width="1.5" PointX="5.25" PointY="1.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="InsuranceBPaaSModel.KYC_Doc_Master" Width="1.5" PointX="5.25" PointY="5.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="InsuranceBPaaSModel.Med_Report_Details" Width="1.5" PointX="10" PointY="1" IsExpanded="true" />
-        <EntityTypeShape EntityType="InsuranceBPaaSModel.Med_Report_Master" Width="1.5" PointX="7.75" PointY="1.25" IsExpanded="true" />
         <EntityTypeShape EntityType="InsuranceBPaaSModel.Policy_Master" Width="1.5" PointX="3" PointY="3.625" IsExpanded="true" />
         <EntityTypeShape EntityType="InsuranceBPaaSModel.Type_Master" Width="1.5" PointX="0.75" PointY="4.125" IsExpanded="true" />
         <AssociationConnector Association="InsuranceBPaaSModel.FK__Document___Polic__412EB0B6" ManuallyRouted="false" />
-        <AssociationConnector Association="InsuranceBPaaSModel.FK__KYC_Doc_M__Polic__4222D4EF" ManuallyRouted="false" />
-        <AssociationConnector Association="InsuranceBPaaSModel.FK__Med_Repor__Repor__4F7CD00D" ManuallyRouted="false" />
-        <AssociationConnector Association="InsuranceBPaaSModel.FK__Med_Repor__Repor__5070F446" ManuallyRouted="false" />
         <AssociationConnector Association="InsuranceBPaaSModel.FK__Policy_Ma__Polic__45F365D3" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="InsuranceBPaaSModel.DocType_Master" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="InsuranceBPaaSModel.Med_Report_Master" Width="1.5" PointX="7.875" PointY="13.875" />
+        <AssociationConnector Association="InsuranceBPaaSModel.FK__Med_Repor__DocMa__18EBB532" />
+        <EntityTypeShape EntityType="InsuranceBPaaSModel.KYC_Verify_Master" Width="1.5" PointX="10.875" PointY="1" />
+        <AssociationConnector Association="InsuranceBPaaSModel.FK__KYC_Verif__DocMa__43D61337" />
+        <AssociationConnector Association="InsuranceBPaaSModel.FK__KYC_Verif__Polic__44CA3770" />
+        <EntityTypeShape EntityType="InsuranceBPaaSModel.Med_Report_Details" Width="1.5" PointX="10.125" PointY="13.75" />
+        <AssociationConnector Association="InsuranceBPaaSModel.FK__Med_Repor__Repor__1BC821DD" />
+        <EntityTypeShape EntityType="InsuranceBPaaSModel.CaseSummary" Width="1.5" PointX="0.75" PointY="7.75" />
+        <EntityTypeShape EntityType="InsuranceBPaaSModel.IncomeAllowableFactor" Width="1.5" PointX="2.75" PointY="7.75" />
+        <EntityTypeShape EntityType="InsuranceBPaaSModel.Monthly_Finance_Master" Width="1.5" PointX="10.875" PointY="6.25" />
+        <EntityTypeShape EntityType="InsuranceBPaaSModel.Yearly_Finance_Master" Width="1.5" PointX="7.875" PointY="8.125" />
+        <AssociationConnector Association="InsuranceBPaaSModel.FK__Monthly_F__DocMa__531856C7" />
+        <AssociationConnector Association="InsuranceBPaaSModel.FK__Yearly_Fi__DocMa__55F4C372" />
+        <AssociationConnector Association="InsuranceBPaaSModel.FK__Monthly_F__Polic__540C7B00" />
+        <AssociationConnector Association="InsuranceBPaaSModel.FK__Yearly_Fi__Polic__56E8E7AB" />
+        <EntityTypeShape EntityType="InsuranceBPaaSModel.Proposal_Master" Width="1.5" PointX="7.5" PointY="0.75" />
+        <AssociationConnector Association="InsuranceBPaaSModel.FK__Proposal___DocMa__5BAD9CC8" />
+        <AssociationConnector Association="InsuranceBPaaSModel.FK__Proposal___DocMa__5E8A0973" />
+        <AssociationConnector Association="InsuranceBPaaSModel.FK__Proposal___Polic__5CA1C101" />
+        <AssociationConnector Association="InsuranceBPaaSModel.FK__Proposal___Polic__5F7E2DAC" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
