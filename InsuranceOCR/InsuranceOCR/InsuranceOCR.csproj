@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.101.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="OpenCvSharp4" Version="4.7.0.20230115" />
     <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.7.0.20230115" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
@@ -19,6 +20,9 @@
     <Reference Include="SautinSoft.PdfFocus">
       <HintPath>..\..\..\..\..\..\..\Shuheb\OCR_New\packages\SautinSoft.PdfFocus.dll</HintPath>
     </Reference>
+    <None Update="ProposalValues.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="MedicalReports.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

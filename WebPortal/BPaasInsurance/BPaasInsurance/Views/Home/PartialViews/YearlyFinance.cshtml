@@ -1,0 +1,51 @@
+﻿@model List<BPaasInsurance.Yearly_Finance_Master>
+
+
+@using (Html.BeginForm("SaveFinancialDetails", "Home", FormMethod.Post))
+{
+    <div id="dv_ITR" class="ITR col-md-12 panel-body border overflow-auto dv_financial_details">
+
+
+        <table>
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                <tr>
+                    <td>
+
+                        @Html.HiddenFor(m => m[i].YearlyFinance_Id)
+                        @Html.HiddenFor(m => m[i].PolicyNo)
+                        @Html.HiddenFor(m => m[i].DocMasterID)
+                        @Html.HiddenFor(m => m[i].coi)
+                        @Html.HiddenFor(m => m[i].Form16_AY)
+                        @Html.HiddenFor(m => m[i].YearFrom)
+                        @Html.HiddenFor(m => m[i].YearTo)
+                        @Html.HiddenFor(m => m[i].CreatedDate)
+                        @Html.HiddenFor(m => m[i].CreatedBy)
+
+                        ITR for @Model[i].YearFrom- @Model[i].YearTo
+
+                    </td>
+                    <td>
+                        @Html.TextBoxFor(m => m[i].Gross_AY, Convert.ToString(Model[i].Gross_AY.Value), new { @style = "  width: 130px;", @class = "form-control" })
+                    </td>
+                </tr>
+
+
+            }
+            @if (ViewBag.caseSummary != null)
+            {
+                <tr>
+                    <td> Customer Eligible For Amount(INR) :</td>
+                    <td><b>@ViewBag.caseSummary.CustomerEligibilityOnITR</b></td>
+                </tr>
+            }
+        </table>
+
+    </div>
+
+    <div class="buttonFooter">
+        <input type="submit" value="Save" class="btn btn-success" style="border-radius: 16px; width: 12%;" />
+        <button type="button" class="btn btn-secondary" style="border-radius: 16px; width: 12%;">Reset</button>
+        <input type="button" class="btn btn-secondary" value="Cancel" style="border-radius: 16px; width: 12%;" onclick="@("window.location.href='" + @Url.Action("Index", "Home") + "'");" />
+    </div>
+}

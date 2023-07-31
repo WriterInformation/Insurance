@@ -18,7 +18,11 @@ namespace BPaasInsurance
         public Policy_Master()
         {
             this.Document_Master = new HashSet<Document_Master>();
-            this.KYC_Doc_Master = new HashSet<KYC_Doc_Master>();
+            this.KYC_Verify_Master = new HashSet<KYC_Verify_Master>();
+            this.Monthly_Finance_Master = new HashSet<Monthly_Finance_Master>();
+            this.Yearly_Finance_Master = new HashSet<Yearly_Finance_Master>();
+            this.Proposal_Master = new HashSet<Proposal_Master>();
+            this.Proposal_Master1 = new HashSet<Proposal_Master>();
         }
     
         public int PolicyNo { get; set; }
@@ -30,8 +34,16 @@ namespace BPaasInsurance
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Document_Master> Document_Master { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<KYC_Doc_Master> KYC_Doc_Master { get; set; }
         public virtual Type_Master Type_Master { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<KYC_Verify_Master> KYC_Verify_Master { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Monthly_Finance_Master> Monthly_Finance_Master { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Yearly_Finance_Master> Yearly_Finance_Master { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Proposal_Master> Proposal_Master { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Proposal_Master> Proposal_Master1 { get; set; }
     }
 }

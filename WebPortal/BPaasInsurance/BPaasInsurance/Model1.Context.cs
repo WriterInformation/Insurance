@@ -26,10 +26,16 @@ namespace BPaasInsurance
         }
     
         public virtual DbSet<Document_Master> Document_Master { get; set; }
-        public virtual DbSet<KYC_Doc_Master> KYC_Doc_Master { get; set; }
-        public virtual DbSet<Med_Report_Details> Med_Report_Details { get; set; }
-        public virtual DbSet<Med_Report_Master> Med_Report_Master { get; set; }
         public virtual DbSet<Policy_Master> Policy_Master { get; set; }
         public virtual DbSet<Type_Master> Type_Master { get; set; }
+        public virtual DbSet<DocType_Master> DocType_Master { get; set; }
+        public virtual DbSet<Med_Report_Master> Med_Report_Master { get; set; }
+        public virtual DbSet<KYC_Verify_Master> KYC_Verify_Master { get; set; }
+        public virtual DbSet<Med_Report_Details> Med_Report_Details { get; set; }
+        public virtual DbSet<CaseSummary> CaseSummaries { get; set; }
+        public virtual DbSet<IncomeAllowableFactor> IncomeAllowableFactors { get; set; }
+        public virtual DbSet<Monthly_Finance_Master> Monthly_Finance_Master { get; set; }
+        public virtual DbSet<Yearly_Finance_Master> Yearly_Finance_Master { get; set; }
+        public virtual DbSet<Proposal_Master> Proposal_Master { get; set; }
     }
 }

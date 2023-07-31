@@ -1,30 +1,148 @@
 ﻿@model BPaasInsurance.Models.PolicyDetailsViewModel
-
+@using System.Globalization;
 <!DOCTYPE html>
 
 <html>
 <head>
+    <script src="~/Content/sweetalert/sweetalert.js"></script>
+    <link href="~/Content/sweetalert/sweetalert.css" rel="stylesheet" />
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="~/Scripts/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <style>
         th, td {
             padding: 5px;
         }
+
+        .medicalHeader {
+            padding: 10px;
+            padding-left: 3px;
+        }
+
+        .buttonFooter {
+            padding: 10px;
+            padding-left: 20px;
+        }
+
+        .dv_blood_details {
+            width: 95%;
+            margin: 0 auto;
+            border-radius: 10px;
+            height: 330px;
+        }
+
+        .dv_ecg_details {
+            width: 95%;
+            margin: 0 auto;
+            border-radius: 10px;
+            height: 366px;
+        }
+
+        .dv_financial_details {
+            width: 95%;
+            margin: 0 auto;
+            border-radius: 10px;
+            height: 352px;
+            padding: 15px
+        }
+
+        .dv_proposal_details {
+            width: 95%;
+            margin: 0 auto;
+            border-radius: 10px;
+            height: 391px;
+            background-color: white;
+            padding: 15px
+        }
+
+        .margin {
+            margin: 0 auto;
+        }
+
+        .margin_left {
+            margin-left: 20px;
+        }
     </style>
     <script type="text/javascript">
-        function setTextBg() {
-            var color = document.getElementById("txtTestValue").value; // cached
-
-            // The working function for changing background color.
-            document.bgColor = "bg-danger text-white";
-
-            // The code I'd like to use for changing the text simultaneously - however it does not work.
-            document.getElementById("coltext").style.color = color;
+        function openDoc() {
+            console.log(document.getElementById("dv_DocView").contentWindow.location.href);
+            window.open(document.getElementById("dv_DocView").contentWindow.location.href);
         }
+
+         $(document).ready(function () {
+             $("#nav-medical-tab").click(function () {
+
+                $("#dv_DocView").attr("src", "@ViewBag.BloodTestPath")
+
+             });
+
+              $("#nav-financial-tab").click(function () {
+
+                $("#dv_DocView").attr("src", "@ViewBag.FinancialPath")
+
+              });
+
+             $("#nav-proposal-tab").click(function () {
+
+                $("#dv_DocView").attr("src", "@ViewBag.ProposalPath")
+
+            });
+        });
+
+        $(document).ready(function () {
+            $("#dvECG").hide();
+            $("#dv_DocView").attr("src", "@ViewBag.BloodTestPath")
+            $("input[name$='report']").click(function () {
+                var test = $(this).val();
+
+                if (test == "Blood") {
+                    $("#dvECG").hide();
+                    $("#dvBlood").show();
+                    $("#dv_DocView").attr("src","@ViewBag.BloodTestPath")
+                }
+                else if (test == "ECG") {
+                    $("#dvBlood").hide();
+                    $("#dvECG").show();
+
+                    $("#dv_DocView").attr("src", "@ViewBag.ECGPath")
+                }
+
+            });
+        });
+
+        $(document).ready(function () {
+            $("#dvITR").hide();
+            $("#dvBankSt").hide();
+            $("#dd_FinancialDoc").change(function () {
+                var test = $(this).val();
+
+                if (test == "SalarySlip") {
+                    $("#dvITR").hide();
+                    $("#dvBankSt").hide();
+
+                    $("#dvSalary").show();
+                    $("#dv_DocView").attr("src", "@ViewBag.SalarySlipPath")
+                }
+                else if (test == "ITR") {
+                    $("#dvSalary").hide();
+                    $("#dvBankSt").hide();
+
+                    $("#dvITR").show();
+                }
+                else if (test == "BankSt") {
+                    $("#dvSalary").hide();
+                    $("#dvITR").hide();
+
+                    $("#dvBankSt").show();
+                }
+
+            });
+        });
+
     </script>
 </head>
-<body onload="setTextBg()">
-
+<body>
     <div class="container-fluid">
         @*<div class="row">
 
@@ -48,107 +166,398 @@
                     <div class="col">
                         <nav>
                             <div class="nav nav-tabs" style="border-radius: 5px; background-color: #d9edf7" id="nav-tab" role="tablist">
-                                <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#medical" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Medical</button>
-                                <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#financial" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Financial</button>
-                                <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#proposal" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Proposal Details</button>
-                                <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#casesummary" type="button" role="tab" aria-controls="nav-contact" aria-selected="false">Case Summary</button>
+                                <button class="nav-link active" id="nav-medical-tab" data-bs-toggle="tab" data-bs-target="#medical" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Medical</button>
+                                <button class="nav-link" id="nav-financial-tab" data-bs-toggle="tab" data-bs-target="#financial" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Financial</button>
+                                <button class="nav-link" id="nav-proposal-tab" data-bs-toggle="tab" data-bs-target="#proposal" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Proposal Details</button>
+                                <button class="nav-link" id="nav-summary-tab" data-bs-toggle="tab" data-bs-target="#casesummary" type="button" role="tab" aria-controls="nav-contact" aria-selected="false">Case Summary</button>
                             </div>
                         </nav>
-                        <div class="tab-content border border-top-0" style="border-radius:5px" id="nav-tabContent">
+                        <div class="tab-content border border-top-0" style="border-radius: 5px; height: 468px" id="nav-tabContent">
 
-                            <div class="tab-pane fade show active" id="medical" role="tabpanel" aria-labelledby="nav-home-tab">
-                                @*<div class="panel-group">*@
+                            <div class="tab-pane fade show active" id="medical" role="tabpanel" aria-labelledby="nav-medical-tab">
                                 <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <br />
+                                    <div class="panel-heading medicalHeader">
                                         &nbsp;&nbsp;&nbsp;
                                         @*@Html.RadioButtonFor(model => model.Gender, "Male")
-                    @Html.RadioButtonFor(model => model.Gender, "Male")*@
+                                            @Html.RadioButtonFor(model => model.Gender, "Male")*@
                                         <input checked="checked"
-                                               id="Gender"
-                                               name="Gender"
+                                               id="chkBloodReport"
+                                               name="report"
                                                type="radio"
-                                               value="Male" />&nbsp;<label>Blood Report</label>
+                                               value="Blood" />&nbsp;<label>Blood Report</label>
                                         &nbsp;
-                                        <input id="Gender"
-                                               name="Gender"
+                                        <input id="chkECGReport"
+                                               name="report"
                                                type="radio"
-                                               value="Female" />&nbsp;<label>ECG Report</label>
-                                    </div><br />
-                                    <div class="panel-body border" style="width: 95%; margin: 0 auto; border-radius: 5px; background-color: #2f4f4f">
-                                        <table id="example" class="display cell-border" style="width: 90%; margin: 0 auto">
-                                            <thead class="text-white">
-                                                <tr>
-
-                                                    <th>Test Name</th>
-                                                    <th>Values</th>
-                                                    <th>Range</th>
-                                                </tr>
-                                            </thead>
-                                        </table>
+                                               value="ECG" />&nbsp;<label>ECG Report</label>
                                     </div>
-                                    <div class="panel-body border overflow-auto" style="width: 95%; margin: 0 auto; border-radius: 10px; background-color: white; height:245px;">
 
-                                        <table id="example" class="display cell-border" style="width: 90%; margin: 0 auto">
-
-                                            <tbody>
-                                                @foreach (var item in Model.med_Report_Details)
-                                                {
-                                                    @Html.HiddenFor(model => item.TestName)
-                                                    <tr>
-
-                                                        <td>
-                                                            @Html.DisplayFor(modelItem => item.TestName)
-                                                        </td>
-                                                        <td>
-                                                            @{
-
-                                                                string textBoxClass = item.HealthStatus == "Normal" ? "form-control text-white bg-success" : (item.HealthStatus == "Abnormal") ? "bg-danger text-white form-control" : "form-control";
-                                                                if (item.StringTestValue == "" || item.StringTestValue == null)
-                                                                {
-                                                                    @Html.TextBox("txtTestValue", Convert.ToString(item.NumericTestValue.Value), new { @style = "  width: 130px;text-align: center;", @class = textBoxClass })
-                                                                }
-                                                                else
-                                                                {
-                                                                    @Html.TextBox("txtTestValue", Convert.ToString(item.StringTestValue), new { @style = " width: 130px;text-align: center; ", @class = textBoxClass })
-                                                                }
-                                                            }
-                                                        </td>
-                                                        <td style="text-align:center">
-                                                            @{
-
-                                                                if (item.StringTestValue == "" || item.StringTestValue == null)
-                                                                {
-                                                                    @(item.RangeFrom + " - " + item.RangeTill)
-                                                                }
-                                                            }
-                                                        </td>
-                                                    </tr>
-                                                }
-                                            </tbody>
-
-                                        </table>
+                                    @****************Blood Report******************@
+                                    <div id="dvBlood">
+                                        @Html.Partial("PartialViews/BloodReport", Model.med_Report_Details.Where(x => x.Med_Report_Master.ReportType != "ECG").ToList())
                                     </div>
-                                    <br />
 
-                                    &nbsp;&nbsp;&nbsp;
-                                    <button type="button" class="btn btn-success">Save</button>
-                                    <button type="button" class="btn btn-secondary">Reset</button>
-                                    <br />
-                                    <br />
+                                    @****************End Blood Report******************@
+
+                                    @****************ECG TMT******************@
+                                    <div id="dvECG">
+                                        @{
+                                            if (Model.med_Report_Master.Where(x => x.ReportType == "ECG").Count() > 0)
+                                            {
+                                                @Html.Partial("PartialViews/ECGReport", Model.med_Report_Details.Where(x => x.Med_Report_Master.ReportType == "ECG").First())
+                                            }
+                                            else
+                                            {
+                                                @Html.Partial("PartialViews/ECGReport", new Med_Report_Details())
+                                            }
+                                        }
+                                    </div>
+
+                                    @****************End ECG TMT******************@
+
 
                                 </div>
 
-                                @*</div>*@
+
                             </div>
-                            <div class="tab-pane fade" id="financial" role="tabpanel" aria-labelledby="nav-profile-tab">
-                               Financial
+                            <div class="tab-pane fade" id="financial" role="tabpanel" aria-labelledby="nav-financial-tab">
+
+                                <div style="padding:5px;margin-left:10px">
+                                    <table>
+                                        <tr>
+                                            <td>Financial Document:</td>
+                                            <td>
+                                                <select name="FinancialDoc" id="dd_FinancialDoc" class="form-control input-dropdown" style="width:100%;">
+                                                    <option selected="selected" value="SalarySlip">Salary Slip</option>
+                                                    <option value="ITR">ITR</option>
+                                                    <option value="BankSt">Bank statement</option>
+                                                    <option value="Form16">Form 16</option>
+                                                    <option value="APC">As Per CIBIL</option>
+                                                    <option value="CTC">CTC Letter</option>
+
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+
+                                <div id="dvSalary">
+                                    @{
+                                        if (Model.monthly_Finance_Master.Count() > 0)
+                                        {
+                                            @Html.Partial("PartialViews/MonthlyFinance", Model.monthly_Finance_Master.ToList())
+                                        }
+                                        else
+                                        {
+                                            <div class="panel-body border dv_financial_details">
+                                                <div class="alert alert-danger" role="alert">
+                                                    Salary Slip OCR not done yet!
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+
+                                </div>
+
+                                <div id="dvITR">
+                                    @{
+                                        if (Model.yearly_Finance_Master.Count() > 0)
+                                        {
+                                            @Html.Partial("PartialViews/YearlyFinance", Model.yearly_Finance_Master.ToList())
+                                        }
+                                        else
+                                        {
+                                            <div class="panel-body border dv_financial_details">
+                                                <div class="alert alert-danger" role="alert">
+                                                    ITR OCR not done yet!
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+
+                                <div id="dvBankSt">
+                                    @*
+                                            @{
+
+                                            @Html.Partial("PartialViews/Financial", Model.finance_Master.ToList())
+
+                                        }
+
+                                        <div id="dv_BankSt" class="BankSt col-md-12 panel-body border overflow-auto dv_financial_details">
+                                        </div>
+                                    *@
+                                </div>
                             </div>
-                            <div class="tab-pane fade" id="proposal" role="tabpanel" aria-labelledby="nav-contact-tab">
-                                Proposal
+
+                            <div class="tab-pane fade" id="proposal" role="tabpanel" aria-labelledby="nav-proposal-tab">
+                                <div style="height:18px"></div>
+
+                                @if (Model.proposal_Master != null)
+                                {
+                                    @Html.Partial("PartialViews/ProposalDetails", Model.proposal_Master)
+                                }
+                                else
+                                {
+                                    <div id="proposal1" class="panel-body border overflow-auto dv_proposal_details">
+                                        <div class="alert alert-danger" role="alert">
+                                            Proposal Form OCR not done yet!
+                                        </div>
+                                    </div>
+                                }
                             </div>
-                            <div class="tab-pane fade" id="casesummary" role="tabpanel" aria-labelledby="nav-contact-tab">
-                                Case summary
+                            <div class="tab-pane fade" id="casesummary" role="tabpanel" aria-labelledby="nav-summary-tab">
+                                <div style="height:18px"></div>
+
+                                @using (Html.BeginForm())
+                                {
+                                    if (Model.proposal_Master != null)
+                                    {
+                                        <div id="caseSummary" class="panel-body border overflow-auto dv_proposal_details">
+
+                                            <table>
+                                                <tr>
+                                                    <td>
+                                                        @*@Html.LabelFor(model => model.proposal_Master.PolicyNo)*@
+                                                        Policy Number
+                                                    </td>
+                                                    <td>@Html.TextBoxFor(model => model.proposal_Master.PolicyNo, new { @class = "form-control" })</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        @*@Html.LabelFor(model => model.proposal_Master.FirstName)*@
+                                                        Proposer Name
+                                                    </td>
+                                                    <td>@Html.TextBoxFor(model => model.proposal_Master.FirstName, new { @class = "form-control" })</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        @*@Html.LabelFor(model => model.proposal_Master.FirstName)*@
+                                                        Proposer Age
+                                                    </td>
+                                                    <td>
+                                                        @*@Html.TextBoxFor(model => model.proposal_Master.FirstName, new { @style = "  width: 200px;", @class = "form-control" })*@
+                                                        <input type="text" class="form-control" />
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        @*@Html.LabelFor(model => model.proposal_Master.FirstName)*@
+                                                        Gender
+                                                    </td>
+                                                    <td>
+                                                        @*@Html.TextBoxFor(model => model.proposal_Master.FirstName, new { @style = "  width: 200px;", @class = "form-control" })*@
+                                                        <input type="text" class="form-control" />
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        @*@Html.LabelFor(model => model.proposal_Master.FirstName)*@
+                                                        AFYP
+                                                    </td>
+                                                    <td>
+                                                        @*@Html.TextBoxFor(model => model.proposal_Master.FirstName, new { @style = "  width: 200px;", @class = "form-control" })*@
+                                                        <input type="text" class="form-control" />
+                                                    </td>
+                                                </tr>
+
+
+                                                <tr>
+                                                    <td>
+                                                        @*@Html.LabelFor(model => model.proposal_Master.Education)*@
+                                                        Education
+                                                    </td>
+                                                    <td>@Html.TextBoxFor(model => model.proposal_Master.Education, new { @class = "form-control" })</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        @*@Html.LabelFor(model => model.proposal_Master.Occupation)*@
+                                                        Occupation
+                                                    </td>
+                                                    <td>@Html.TextBoxFor(model => model.proposal_Master.Occupation, new { @class = "form-control" })</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        @*@Html.LabelFor(model => model.proposal_Master.AnnualIncome)*@
+                                                        Declared Income
+                                                    </td>
+                                                    <td>@Html.TextBoxFor(model => model.proposal_Master.AnnualIncome, new { @class = "form-control" })</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        @*@Html.LabelFor(model => model.proposal_Master.CurrentCity)*@
+                                                        City (Current/Permanent)
+                                                    </td>
+                                                    <td>@Html.TextBoxFor(model => model.proposal_Master.CurrentCity, new { @class = "form-control" })</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        @*@Html.LabelFor(model => model.proposal_Master.CurrentPinCode)*@
+                                                        PIN Code (Current/Permanent)
+                                                    </td>
+                                                    <td>@Html.TextBoxFor(model => model.proposal_Master.CurrentPinCode, new { @class = "form-control" })</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        @*@Html.LabelFor(model => model.proposal_Master.FirstName)*@
+                                                        Channel Name
+                                                    </td>
+                                                    <td>
+                                                        @*@Html.TextBoxFor(model => model.proposal_Master.FirstName, new { @style = "  width: 200px;", @class = "form-control" })*@
+                                                        <input type="text" class="form-control" />
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        @*@Html.LabelFor(model => model.proposal_Master.FirstName)*@
+                                                        Kickout Message
+                                                    </td>
+                                                    <td>
+                                                        @*@Html.TextBoxFor(model => model.proposal_Master.FirstName, new { @style = "  width: 200px;", @class = "form-control" })*@
+                                                        @Html.TextArea("txtKickOutMsg", new { @class = "form-control" })
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        @*@Html.LabelFor(model => model.proposal_Master.FirstName)*@
+                                                        Effective Date
+                                                    </td>
+                                                    <td>
+                                                        @*@Html.TextBoxFor(model => model.proposal_Master.FirstName, new { @style = "  width: 200px;", @class = "form-control" })*@
+                                                        <input type="text" class="form-control" />
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        @*@Html.LabelFor(model => model.proposal_Master.SumAssured)*@
+                                                        Sum Assured
+                                                    </td>
+                                                    <td>@Html.TextBoxFor(model => model.proposal_Master.SumAssured, new { @class = "form-control" })</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        @Html.LabelFor(model => model.proposal_Master.PercentageShare)
+                                                    </td>
+                                                    <td>@Html.TextBoxFor(model => model.proposal_Master.PercentageShare, new { @class = "form-control" })</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        @*@Html.LabelFor(model => model.proposal_Master.SumAssured)*@
+                                                        Relation with Proposer
+                                                    </td>
+                                                    <td>@Html.TextBoxFor(model => model.proposal_Master.SumAssured, new { @class = "form-control" })</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        @*@Html.LabelFor(model => model.proposal_Master.FirstName)*@
+                                                        Photo Match Score
+                                                    </td>
+                                                    <td>
+                                                        @*@Html.TextBoxFor(model => model.proposal_Master.FirstName, new { @style = "  width: 200px;", @class = "form-control" })*@
+                                                        <input type="text" class="form-control" />
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        @*@Html.LabelFor(model => model.proposal_Master.FirstName)*@
+                                                        BMI (Body Mass Index)
+                                                    </td>
+                                                    <td>
+                                                        @*@Html.TextBoxFor(model => model.proposal_Master.FirstName, new { @style = "  width: 200px;", @class = "form-control" })*@
+                                                        <input type="text" class="form-control" />
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        @*@Html.LabelFor(model => model.proposal_Master.FirstName)*@
+                                                        Blood Pressure
+                                                    </td>
+                                                    <td>
+                                                        @*@Html.TextBoxFor(model => model.proposal_Master.FirstName, new { @style = "  width: 200px;", @class = "form-control" })*@
+                                                        <input type="text" class="form-control" />
+                                                    </td>
+                                                </tr>
+
+
+                                                <tr>
+                                                    <td>
+                                                        @*@Html.LabelFor(model => model.proposal_Master.FirstName)*@
+                                                        ECG
+                                                    </td>
+                                                    <td>
+                                                        @*@Html.TextBoxFor(model => model.proposal_Master.FirstName, new { @style = "  width: 200px;", @class = "form-control" })*@
+                                                        <input type="text" class="form-control" />
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        @*@Html.LabelFor(model => model.proposal_Master.FirstName)*@
+                                                        UCT
+                                                    </td>
+                                                    <td>
+                                                        @*@Html.TextBoxFor(model => model.proposal_Master.FirstName, new { @style = "  width: 200px;", @class = "form-control" })*@
+                                                        <input type="text" class="form-control" />
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        @*@Html.LabelFor(model => model.proposal_Master.FirstName)*@
+                                                        CREATININE
+                                                    </td>
+                                                    <td>
+                                                        @*@Html.TextBoxFor(model => model.proposal_Master.FirstName, new { @style = "  width: 200px;", @class = "form-control" })*@
+                                                        <input type="text" class="form-control" />
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        @*@Html.LabelFor(model => model.proposal_Master.FirstName)*@
+                                                        Blood Urine Test (Abnormal Values)
+                                                    </td>
+                                                    <td>
+                                                        @*@Html.TextBoxFor(model => model.proposal_Master.FirstName, new { @style = "  width: 200px;", @class = "form-control" })*@
+                                                        @Html.TextArea("txtBloodUrineTest", new { @class = "form-control" })
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        @*@Html.LabelFor(model => model.proposal_Master.FirstName)*@
+                                                        Medical History
+                                                    </td>
+                                                    <td>
+                                                        @*@Html.TextBoxFor(model => model.proposal_Master.FirstName, new { @style = "  width: 200px;", @class = "form-control" })*@
+                                                        @Html.TextArea("txtMedHist", new { @class = "form-control" })
+                                                    </td>
+                                                </tr>
+
+
+
+                                            </table>
+
+
+                                        </div>
+                                    }
+                                }
                             </div>
 
                         </div>
@@ -156,29 +565,25 @@
                 </div>
             </div>
 
-            <div class="container border" style="border-radius: 5px">
-                <div class="row">
-                    <div class="panel panel-default" style="padding: 10px;">
-                        <center>
-                            <div class="dropdown">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Select Document
-                                </button>
-                                <ul class="dropdown-menu">
-                                    @foreach (var item in Model.document_Master)
-                                    {
-                                        <li><a class="dropdown-item" href="@item.Document_Path" target="dv_DocView">@item.DocumentName</a></li>
-                                    }
-                                </ul>
-                            </div>
-                        </center>
-                    </div>
-                    <div class="panel panel-default border">
-                        <iframe src="" name="dv_DocView" height="410px" width="100%" title="Document View"></iframe>
-                    </div>
-
-
-
+            <div class="container border" style="border-radius: 5px; background-color: #d9edf7;padding:0px">
+                <div class="panel panel-default" style="padding: 4px;">
+                    <center>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Select Document
+                            </button>&nbsp;
+                            <span class="fa fa-external-link" style="position: absolute; top: 8px; left: 395px;" onclick="openDoc()" title="Open document in new window"></span>
+                            <ul class="dropdown-menu" style="max-height:280px; overflow-y:auto">
+                                @foreach (var item in Model.document_Master)
+                                {
+                                    <li><a class="dropdown-item" href="@item.Document_Path" target="dv_DocView">@item.DocumentName</a></li>
+                                }
+                            </ul>
+                        </div>
+                    </center>
+                </div>
+                <div class="panel panel-default border" style="height: 470px;width:100%;background-color:white">
+                    <iframe src="" name="dv_DocView" id="dv_DocView" height="100%" width="100%" title="Document View"></iframe>
                 </div>
             </div>
         </div>

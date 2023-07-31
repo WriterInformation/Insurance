@@ -1,0 +1,213 @@
+﻿@model BPaasInsurance.Proposal_Master
+@using System.Globalization;
+@using (Html.BeginForm("SaveProposalDetails", "Home", FormMethod.Post))
+{
+    <div id="proposal" class="panel-body border overflow-auto dv_proposal_details">
+
+        <table>
+            <tr>
+                <td>
+                    @Html.HiddenFor(model => model.ProposalNo)
+                    @Html.HiddenFor(model => model.PolicyNo)
+                    @Html.HiddenFor(model => model.DocMasterID)
+                    @Html.HiddenFor(model => model.CreatedDate)
+                    @Html.HiddenFor(model => model.CreatedBy)
+
+                    @Html.LabelFor(model => model.PolicyNo)
+                </td>
+                <td>@Html.TextBoxFor(model => model.PolicyNo, new { @style = "width: 200px;", @class = "form-control", @disabled = "disabled" })</td>
+            </tr>
+            <tr>
+                <td>@Html.LabelFor(model => model.Title)</td>
+                <td>@Html.TextBoxFor(model => model.Title, new { @style = "  width: 200px;", @class = "form-control" })</td>
+            </tr>
+            <tr>
+                <td>@Html.LabelFor(model => model.FirstName)</td>
+                <td>@Html.TextBoxFor(model => model.FirstName, new { @style = "  width: 200px;", @class = "form-control" })</td>
+                <td>
+                    @if (ViewBag.kyc_Verify_Master != null)
+                    {
+                        if (ViewBag.kyc_Verify_Master.Name == 0)
+                        {
+                            <i class="fa fa-close" title="OCR Not Verified" style="color:red"></i>
+                        }
+                        else
+                        {
+                            <i class="fa fa-check" title="OCR Verified" style="color:green"></i>
+                        }
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td>@Html.LabelFor(model => model.MiddleName)</td>
+                <td>@Html.TextBoxFor(model => model.MiddleName, new { @style = "  width: 200px;", @class = "form-control" })</td>
+                <td>
+                    @if (ViewBag.kyc_Verify_Master != null)
+                    {
+                        if (ViewBag.kyc_Verify_Master.Name == 0)
+                        {
+                            <i class="fa fa-close" title="OCR Not Verified" style="color:red"></i>
+                        }
+                        else
+                        {
+                            <i class="fa fa-check" title="OCR Verified" style="color:green"></i>
+                        }
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td>@Html.LabelFor(model => model.LastName)</td>
+                <td>@Html.TextBoxFor(model => model.LastName, new { @style = "  width: 200px;", @class = "form-control" })</td>
+                <td>
+                    @if (ViewBag.kyc_Verify_Master != null)
+                    {
+                        if (ViewBag.kyc_Verify_Master.Name == 0)
+                        {
+                            <i class="fa fa-close" title="OCR Not Verified" style="color:red"></i>
+                        }
+                        else
+                        {
+                            <i class="fa fa-check" title="OCR Verified" style="color:green"></i>
+                        }
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td>@Html.LabelFor(model => model.DOB)</td>
+                <td>
+                    @if (Model != null)
+                    {
+                        @Html.TextBoxFor(model => model.DOB, "{0:dd/MM/yyyy}", new { @type = "date", @style = "width: 200px;", @class = "form-control" })
+                    }
+                </td>
+                <td>
+                    @if (ViewBag.kyc_Verify_Master != null)
+                    {
+                        if (ViewBag.kyc_Verify_Master.DOB == 0)
+                        {
+                            <i class="fa fa-close" title="OCR Not Verified" style="color:red"></i>
+                        }
+                        else
+                        {
+                            <i class="fa fa-check" title="OCR Verified" style="color:green"></i>
+                        }
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td>@Html.LabelFor(model => model.Education)</td>
+                <td>@Html.TextBoxFor(model => model.Education, new { @style = "  width: 200px;", @class = "form-control" })</td>
+            </tr>
+            <tr>
+                <td>@Html.LabelFor(model => model.Occupation)</td>
+                <td>@Html.TextBoxFor(model => model.Occupation, new { @style = "  width: 200px;", @class = "form-control" })</td>
+            </tr>
+            <tr>
+                <td>@Html.LabelFor(model => model.Employer)</td>
+                <td>@Html.TextBoxFor(model => model.Employer, new { @style = "  width: 200px;", @class = "form-control" })</td>
+            </tr>
+            <tr>
+                <td>@Html.LabelFor(model => model.AnnualIncome)</td>
+                <td>@Html.TextBoxFor(model => model.AnnualIncome, new { @style = "  width: 200px;", @class = "form-control" })</td>
+            </tr>
+            <tr>
+                <td>@Html.LabelFor(model => model.PercentageShare)</td>
+                <td>@Html.TextBoxFor(model => model.PercentageShare, new { @style = "  width: 200px;", @class = "form-control" })</td>
+            </tr>
+            <tr>
+                <td>@Html.LabelFor(model => model.CurrentCity)</td>
+                <td>@Html.TextBoxFor(model => model.CurrentCity, new { @style = "  width: 200px;", @class = "form-control" })</td>
+                <td>
+                    @if (ViewBag.kyc_Verify_Master != null)
+                    {
+                        if (ViewBag.kyc_Verify_Master.City == 0)
+                        {
+                            <i class="fa fa-close" title="OCR Not Verified" style="color:red"></i>
+                        }
+                        else
+                        {
+                            <i class="fa fa-check" title="OCR Verified" style="color:green"></i>
+                        }
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td>@Html.LabelFor(model => model.CurrentPinCode)</td>
+                <td>@Html.TextBoxFor(model => model.CurrentPinCode, new { @style = "  width: 200px;", @class = "form-control" })</td>
+                <td>
+                    @if (ViewBag.kyc_Verify_Master != null)
+                    {
+                        if (ViewBag.kyc_Verify_Master.Pincode == 0)
+                        {
+                            <i class="fa fa-close" title="OCR Not Verified" style="color:red"></i>
+                        }
+                        else
+                        {
+                            <i class="fa fa-check" title="OCR Verified" style="color:green"></i>
+                        }
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td>@Html.LabelFor(model => model.MobileNo)</td>
+                <td>@Html.TextBoxFor(model => model.MobileNo, new { @style = "  width: 200px;", @class = "form-control" })</td>
+            </tr>
+            <tr>
+                <td>@Html.LabelFor(model => model.EmailID)</td>
+                <td>@Html.TextBoxFor(model => model.EmailID, new { @style = "  width: 200px;", @class = "form-control" })</td>
+            </tr>
+            <tr>
+                <td>@Html.LabelFor(model => model.PermanentCity)</td>
+                <td>@Html.TextBoxFor(model => model.PermanentCity, new { @style = "  width: 200px;", @class = "form-control" })</td>
+                <td>
+                    @if (ViewBag.kyc_Verify_Master != null)
+                    {
+                        if (ViewBag.kyc_Verify_Master.City == 0)
+                        {
+                            <i class="fa fa-close" title="OCR Not Verified" style="color:red"></i>
+                        }
+                        else
+                        {
+                            <i class="fa fa-check" title="OCR Verified" style="color:green"></i>
+                        }
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td>@Html.LabelFor(model => model.PermanentPinCode)</td>
+                <td>@Html.TextBoxFor(model => model.PermanentPinCode, new { @style = "  width: 200px;", @class = "form-control" })</td>
+                <td>
+                    @if (ViewBag.kyc_Verify_Master != null)
+                    {
+                        if (ViewBag.kyc_Verify_Master.Pincode == 0)
+                        {
+                            <i class="fa fa-close" title="OCR Not Verified" style="color:red"></i>
+                        }
+                        else
+                        {
+                            <i class="fa fa-check" title="OCR Verified" style="color:green"></i>
+                        }
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td>@Html.LabelFor(model => model.SumAssured)</td>
+                <td>@Html.TextBoxFor(model => model.SumAssured, new { @style = "  width: 200px;", @class = "form-control" })</td>
+            </tr>
+            <tr>
+                <td>@Html.LabelFor(model => model.Gender)</td>
+                <td>@Html.TextBoxFor(model => model.Gender, new { @style = "  width: 200px;", @class = "form-control" })</td>
+            </tr>
+            <tr>
+                <td>@Html.LabelFor(model => model.RelationWithProposer)</td>
+                <td>@Html.TextBoxFor(model => model.RelationWithProposer, new { @style = "  width: 200px;", @class = "form-control" })</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="buttonFooter">
+        <input type="submit" value="Save" class="btn btn-success" id="btnSave" style="border-radius: 16px; width: 12%;"/>
+        <button type="button" class="btn btn-secondary" style="border-radius: 16px; width: 12%;">Reset</button>
+        <input type="button" class="btn btn-secondary" value="Cancel" style="border-radius: 16px; width: 12%;" onclick="@("window.location.href='" + @Url.Action("Index", "Home") + "'");" />
+    </div>
+}

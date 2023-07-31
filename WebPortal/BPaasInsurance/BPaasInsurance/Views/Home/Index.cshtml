@@ -1,8 +1,8 @@
 ﻿@model List<BPaasInsurance.Policy_Master>
 
 @*@{
-    Layout = null;
-}*@
+        Layout = null;
+    }*@
 
 <!DOCTYPE html>
 
@@ -15,7 +15,6 @@
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" rel="stylesheet" />
-
     <script>
         $(document).ready(function () {
             $('#example').DataTable({
@@ -26,7 +25,7 @@
                 //scrollCollapse: true,   //For Scrolling
             });
         });
-  
+
         $(function () {
             try {
                 var dir = $('#dir').val();
@@ -121,13 +120,12 @@
                 </div>
             </div>*@
 
-        <table id="example" class="display cell-border" style="width:100%">
+        <table id="example" class="display cell-border" style="width: 100%; padding-top: 10px;">
             <thead>
                 <tr style="background-color: #ffcc51 ">
-
                     <th>Policy No</th>
                     <th>Created Date</th>
-                    <th>Policy Status Code</th>
+                    <th>Policy Status</th>
                     <th>View Policy Details</th>
                 </tr>
             </thead>
@@ -144,7 +142,7 @@
                             @item.CreatedDate.Value.ToString("dddd, dd MMMM yyyy")
                         </td>
                         <td>
-                            @((item.PolicyStatusCode == 1) ? "Active" : "Inactive")
+                            @((item.PolicyStatusCode == 0) ? "OCR Pending" : ((item.PolicyStatusCode == 1) ? "OCR Processed" : "OCR Failed"))
                         </td>
                         <td style="text-align:center">
                             @Html.ActionLink("View", "ViewPolicyDetails", new { PolicyNo = item.PolicyNo })
@@ -159,12 +157,6 @@
         </table>
 
     </div>
-    <a href="@ViewBag.Doc">View Document</a>
-
-    
-
-
-
 </body>
 </html>
 

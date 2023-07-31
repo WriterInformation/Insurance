@@ -12,20 +12,22 @@ namespace BPaasInsurance
     using System;
     using System.Collections.Generic;
     
-    public partial class KYC_Doc_Master
+    public partial class KYC_Verify_Master
     {
         public int DocID { get; set; }
         public int PolicyNo { get; set; }
-        public int DocType { get; set; }
-        public string Name { get; set; }
-        public string IDNumber { get; set; }
-        public string Address { get; set; }
-        public Nullable<System.DateTime> DOB { get; set; }
+        public int DocMasterID { get; set; }
+        public Nullable<int> Name { get; set; }
+        public Nullable<int> IDNumber { get; set; }
+        public Nullable<int> City { get; set; }
+        public Nullable<int> Pincode { get; set; }
+        public Nullable<int> DOB { get; set; }
         public Nullable<System.DateTime> CreatedDate { get; set; }
         public string CreatedBy { get; set; }
         public Nullable<System.DateTime> ModifiedDate { get; set; }
         public string ModifiedBy { get; set; }
     
+        public virtual Document_Master Document_Master { get; set; }
         public virtual Policy_Master Policy_Master { get; set; }
     }
 }

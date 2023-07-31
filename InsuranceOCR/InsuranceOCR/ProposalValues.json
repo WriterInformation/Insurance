@@ -1,0 +1,93 @@
+[
+  {
+    "Id": 1,
+    "FieldName": "Proposal Number",
+    "Alternatives": "PROPOSAL"
+  },
+  {
+    "Id": 2,
+    "FieldName": "Title",
+    "Alternatives": "TITLE"
+  },
+  {
+    "Id": 3,
+    "FieldName": "First Name",
+    "Alternatives": "FIRST"
+  },
+  {
+    "Id": 4,
+    "FieldName": "Middle Name",
+    "Alternatives": "MIDDLE"
+  },
+  {
+    "Id": 5,
+    "FieldName": "Last Name",
+    "Alternatives": "LAST"
+  },
+  {
+    "Id": 6,
+    "FieldName": "Date Of Birth",
+    "Alternatives": "BIRTH"
+  },
+  {
+    "Id": 7,
+    "FieldName": "Education",
+    "Alternatives": "EDUCATION"
+  },
+  {
+    "Id": 8,
+    "FieldName": "Occupation",
+    "Alternatives": "OCCUPATION"
+  },
+  {
+    "Id": 9,
+    "FieldName": "Employer",
+    "Alternatives": "NAME"
+  },
+  {
+    "Id": 10,
+    "FieldName": "Annual Income",
+    "Alternatives": "ANNUAL"
+  },
+  {
+    "Id": 11,
+    "FieldName": "Percentage Share",
+    "Alternatives": "PERCENTAGE"
+  },
+  {
+    "Id": 12,
+    "FieldName": "Current City",
+    "Alternatives": "CITY"
+  },
+  {
+    "Id": 13,
+    "FieldName": "Current Pin Code",
+    "Alternatives": "PIN"
+  },
+  {
+    "Id": 14,
+    "FieldName": "Mobile Number",
+    "Alternatives": "MOBILE"
+  },
+  {
+    "Id": 15,
+    "FieldName": "E-mail ID",
+    "Alternatives": "E-MAIL"
+  },
+  {
+    "Id": 16,
+    "FieldName": "Permanent City",
+    "Alternatives": "CITY"
+  },
+  {
+    "Id": 17,
+    "FieldName": "Permanent Pin Code",
+    "Alternatives": "PIN"
+  },
+  {
+    "Id": 18,
+    "FieldName": "Sum Assured",
+    "Alternatives": "PLAN"
+  }
+
+]
